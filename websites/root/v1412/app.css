@@ -38,13 +38,16 @@ section {
     position: relative !important;
     padding-bottom: 10px;
 }
-section .md-button:not(.md-fab) {
-    width: 10em;
+
+.md-button:not(.md-fab) {
+    width: 8em;
 }
+
 .md-button.md-fab {
     width: 48px;
     height: 48px;
 }
+
 section .md-button {
     display: block;
     margin: 1em;

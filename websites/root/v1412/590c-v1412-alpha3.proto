@@ -5,33 +5,19 @@ message OpReturn {
   enum Type {
     TAG = 1;
     FILE_PROOF = 2;
-    WWW = 3;
+    FILE_PROOF_URL = 3;
+    WWW = 4;
     CHUNK = 11;
     ASSET_GENESIS     = 31;
     ASSET_TRANSCATION = 32;
     COMMON_ARRAY = 90;
   }
 
-  enum ExtType {
-    ORG_590C = 1;       // http://590c.org/ext/[eid]
-    ORG_590C_TXT = 2;   // http://590c.org/ext/[eid].txt
-    ORG_590C_JSON = 3;  // http://590c.org/ext/[eid].json
-    HTTP = 11;          // http://[eid]
-    HTTP_TXT = 12;      // http://[eid].txt
-    HTTP_JSON = 13;     // http://[eid].json
-    HTTPS = 21;         // https://[eid]
-    HTTPS_TXT = 22;     // https://[eid].txt
-    HTTPS_JSON = 23;    // https://[eid].json
-    GOOGL = 31;         // http://goo.gl/[eid]
-    BITLY = 32;         // http://bit.ly/[eid]
-    PASTEBIN = 33;      // http://pastebin.com/[eid]
-    PASTIE = 34;        // http://pastie.org/[eid]
-    GITHUB_RAW = 35;     // https://raw.githubusercontent.com/[eid]
-  }
-
   enum HashType {
     SHA2_256_RIPEMD_160 = 1;
     SHA2_256_SHA2_256 = 2;
+    SHA3_256_RIPEMD_160 = 3;
+    SHA3_256_SHA3_256 = 4;
     SHA2_256=21;
     SHA2_384=22;
     SHA2_512=23;
@@ -50,7 +36,32 @@ message OpReturn {
     optional bytes tagBytes = 3;
   }
 
-  message TxRef {
+  message FileProof {
+    required HashType hashType = 1;
+    required bytes hashValue = 2;
+    optional string tagString = 3;
+    optional int32 tagInt32 = 4;
+  }
+
+  enum ExtType {
+    RAW_URL = 1; //  [http|https]://[urlString]/org590c.[json|txt|png|jpg|pdf|doc|proto]
+    RAW_URL_HASH = 2; //  [http|https]://[urlString]/[hashHexValue].[json|txt|png|jpg|pdf|doc|proto]
+    ORG_590C = 11;       // 590c.org/ext/[urlString]
+    GOOGL = 31;         // http://goo.gl/[urlId]
+    BITLY = 32;         // http://bit.ly/[urlId]
+    PASTEBIN = 33;      // http://pastebin.com/[urlId]
+    PASTIE = 34;        // http://pastie.org/[urlId]
+    GITHUB_RAW = 35;     // https://raw.githubusercontent.com/[urlId]
+  }
+
+   message FileProofUrl {
+    required HashType hashType = 1;
+    required bytes hashValue = 2;
+    required ExtType extType = 3;
+    required string urlId = 4;
+  }
+
+   message 590cRef {
     required int32 blockHeight = 1;
     required int32 txIndex = 2;
   }
@@ -71,22 +82,11 @@ message OpReturn {
     required bytes valueBytes = 2;
   }
 
-
-  message FileProof {
-    required HashType hashType = 1;
-    required bytes hashValue = 2;
-    optional ExtType extType = 3;
-    optional string eidString = 4;
-    optional int32 eidInt32 = 5;
-    optional string tagString = 6;
-    optional int32 tagInt32 = 7;
-  }
-
-
   required Type type = 1;
   optional Tag tag = 2;
   optional FileProof fileProof = 3;
-  optional Www www = 4;
+  optional FileProofUrl fileProofUrl = 4;
+  optional Www www = 5;
   extensions 100 to 199;
 }
 
