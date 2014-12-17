@@ -72,3 +72,31 @@ Y590c.createTag = function(tagString, tagInt32, tagBytes) {
     Y590c.PbPrint(r);
     return r;
 }
+
+Y590c.toHash160WithSha256 = function(hash256Hex) {
+    // https://github.com/bitcoinjs/bitcoinjs-lib/blob/master/src/script.js
+    var bjsBuffer = bitcoin.Script.fromHex(hash256Hex).toBuffer();
+    // https://github.com/bitcoinjs/bitcoinjs-lib/blob/master/src/crypto.js
+    var bf = bitcoin.crypto.ripemd160(bjsBuffer);
+    return bf.toString('hex');
+}
+
+Y590c.createFileProof = function(hashType, hash160Sha256Hex, fileSize, tagString, tagInt32) {
+    var r = new Y590c.OpReturn(Y590c.OpReturn.Type.FILE_PROOF);
+    console.log('RIPEMD160(SHA2_256(v))=' + hash160Sha256Hex);
+    var dBufHash = dcodeIO.ByteBuffer.fromHex(hash160Sha256Hex);
+    var fr = new Y590c.OpReturn.FileProof(hashType, dBufHash, fileSize);
+    
+    if (tagString) {
+        fr.tagString = tagString;
+    }
+    if (tagInt32) {
+        fr.tagInt32 = tagInt32;
+    }
+
+    r.fileProof = fr;
+    r.hash160Hex = hash160Sha256Hex;
+    Y590c.PbPost(r);
+    Y590c.PbPrint(r);
+    return r;
+}
