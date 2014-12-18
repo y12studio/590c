@@ -45,21 +45,24 @@ message OpReturn {
   }
 
   enum ExtType {
-    RAW_URL = 1; //  [http|https]://[urlString]/org590c.[json|txt|png|jpg|pdf|doc|proto]
-    RAW_URL_HASH = 2; //  [http|https]://[urlString]/[hashHexValue].[json|txt|png|jpg|pdf|doc|proto]
-    ORG_590C = 11;       // 590c.org/ext/[urlString]
-    GOOGL = 31;         // http://goo.gl/[urlId]
-    BITLY = 32;         // http://bit.ly/[urlId]
-    PASTEBIN = 33;      // http://pastebin.com/[urlId]
-    PASTIE = 34;        // http://pastie.org/[urlId]
-    GITHUB_RAW = 35;     // https://raw.githubusercontent.com/[urlId]
+    RAW_URL = 1;            //  [http|https]://[urlString]/org590c.[json|txt|png|jpg|pdf|doc|proto]
+    RAW_URL_HASH = 2;       //  [http|https]://[urlString]/[hashHexValue].[json|txt|png|jpg|pdf|doc|proto]
+    ORG_590C = 11;          //  590c.org/ext/[urlId]
+    ORG_590C_ORACLE = 12;   //  590c.org/ext-oracle/[urlId]
+    GOOGL = 21;             //  http://goo.gl/[urlId]
+    GOOGL_ORACLE = 22;      //  https://www.googleapis.com/urlshortener/v1/url?shortUrl=http://goo.gl/[urlId]
+    BITLY = 52;             //  http://bit.ly/[urlId]
+    PASTEBIN = 53;          //  http://pastebin.com/[urlId]
+    PASTIE = 54;            //  http://pastie.org/[urlId]
+    GITHUB_RAW = 55;        //  https://raw.githubusercontent.com/[urlId]
   }
 
    message FileProofUrl {
     required HashType hashType = 1;
     required bytes hashValue = 2;
-    required ExtType extType = 3;
-    required string urlId = 4;
+    required int32 fileSize = 3;
+    required ExtType extType = 4;
+    required string urlId = 5;
   }
 
    message RefBlock {

@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <link rel="stylesheet" href="//0.y12.tw/js/angular-material/0.6.1/angular-material.min.css">
+  <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+  <link href="app.css" rel="stylesheet">
+</head>
+
+<body ng-app="YourApp">
+
+  <div class="doc-content" ng-controller="YourController">
+    <md-toolbar>
+      <div class="md-toolbar-tools">
+        <span class="md-flex">alpha3(OpReturn.FileProofUrl)</span>
+        <span flex></span>
+        <md-button class="md-fab" aria-label="home" ng-click="ypp.NavGo('index.html')">
+          <md-icon icon="home.svg" style="width: 24px; height: 24px;"></md-icon>
+        </md-button>
+      </div>
+    </md-toolbar>
+    <md-card>
+      <div layout="row">
+        <div class="rowhead">
+          <md-button class="md-fab md-primary" aria-label="index">1</md-button>
+        </div>
+        <div>
+          <h2>Get RIPEMD160(SHA2-256(OverlayOracle.Foo))</h2>
+        </div>
+      </div>
+      <form>
+        <div class="row">
+          <md-text-float label="Foo String" ng-model="foo.tagString"></md-text-float>
+          <md-text-float label="Foo Integer" type="number" ng-model="foo.tagInt32"></md-text-float>
+          <span flex></span>
+          <md-button class="md-raised" ng-click="gen()">Build <i class="fa fa-gears"></i>
+          </md-button>
+        </div>
+        <md-text-float label="size(OverlayOracle.Foo)" ng-model="foo.hex"></md-text-float>
+        <md-text-float label="hex(OverlayOracle.Foo)" ng-model="foo.hex" class="long"></md-text-float>
+        <md-text-float label="RIPEMD160(SHA2_256(OverlayOracle.Foo)) hex" ng-model="opr.hash160" class="long"></md-text-float>
+      </form>
+    </md-card>
+    <md-card>
+      <div layout="row">
+        <div class="rowhead">
+          <md-button class="md-fab md-primary" aria-label="index">2</md-button>
+        </div>
+        <div>
+          <h2>Get base64(OverlayOracle.Foo)</h2>
+        </div>
+      </div>
+      <form>
+        <div class="row">
+          <span flex></span>
+          <md-button class="md-raised" ng-click="gen()">Build <i class="fa fa-gears"></i>
+          </md-button>
+        </div>
+        <md-text-float label="base64(OverlayOracle.Foo)" ng-model="foo.base64" class="long"></md-text-float>
+        <md-text-float label="goo.gl target url http://590c.org/#base64" ng-model="opr.hash160" class="long"></md-text-float>
+      </form>
+    </md-card>
+    <md-card>
+      <div layout="row">
+        <div class="rowhead">
+          <md-button class="md-fab md-primary" aria-label="index">3</md-button>
+        </div>
+        <div>
+          <h2>Get goo.gl short url</h2>
+        </div>
+      </div>
+      <form>
+        <div class="row">
+
+          <span flex></span>
+          <md-button class="md-raised" ng-click="gen()">Build <i class="fa fa-gears"></i>
+          </md-button>
+        </div>
+        <md-text-float label="goo.gl short url id" ng-model="opr.hash160"></md-text-float>
+        <md-text-float label="goo.gl short url" ng-model="opr.hash160" class="long"></md-text-float>
+      </form>
+    </md-card>
+    <md-card>
+      <div layout="row">
+        <div class="rowhead">
+          <md-button class="md-fab md-primary" aria-label="index">4</md-button>
+        </div>
+        <div>
+          <h2>Build(OpReturn.FileProofUrl)</h2>
+        </div>
+      </div>
+      <form>
+        <md-text-float label="SHA2-256 Hex String(*)" ng-model="v.hash256" class="long"></md-text-float>
+        <div class="row">
+          <md-text-float label="File Size Bytes(*)" type="number" ng-model="v.fileSize"></md-text-float>
+          <md-text-float label="Tag String" ng-model="v.eidString"></md-text-float>
+          <md-text-float label="Tag Integer" type="number" ng-model="v.eidInt32"></md-text-float>
+          <span flex></span>
+          <md-button class="md-raised" ng-click="gen()">Build <i class="fa fa-gears"></i>
+          </md-button>
+        </div>
+        <md-text-float label="RIPEMD160(SHA2_256(v))" ng-model="opr.hash160Hex" class="long"></md-text-float>
+        <md-text-float label="OP_RETURN hex" ng-model="opr.orhex" class="long"></md-text-float>
+        <div class="row">
+          <md-text-float label="OP_RETURN size(Max 40bytes)" ng-model="opr.orsize"></md-text-float>
+          <span flex></span>
+          <md-button class="md-raised" ng-click="split()">Split <i class="fa fa-cut"></i>
+          </md-button>
+        </div>
+        <p>{{opr.splitResult}}</p>
+      </form>
+
+    </md-card>
+    <md-card>
+      <div layout="row">
+        <div class="rowhead">
+          <md-button class="md-fab md-primary" aria-label="index">5</md-button>
+        </div>
+        <div>
+          <h2>Parse(OpReturn.FileProofUrl) from blockchain/tx</h2>
+        </div>
+      </div>
+      <form>
+        <md-text-float label="blockchain tx hex" ng-model="findtx" class="long"></md-text-float>
+        <md-text-float label="OP_RETURN Hex" ng-model="fr.orhex" class="long"></md-text-float>
+        <div class="row">
+          <md-text-float label="HashType" ng-model="fr.hashType"></md-text-float>
+          <md-text-float label="FileSize(bytes)" type="number" ng-model="fr.fileSize"></md-text-float>
+        </div>
+        <div class="row">
+          <md-text-float label="FileProof TagString" ng-model="fr.eidString"></md-text-float>
+          <md-text-float label="FileProof TagInt32" ng-model="fr.eidInt32"></md-text-float>
+        </div>
+        <md-text-float label="RIPEMD160(SHA2_256(v))" ng-model="fr.content" class="long"></md-text-float>
+        <div class="row">
+          <span flex></span>
+          <md-button class="md-raised md-primary" ng-click="parseOpReturnTx()">Get/Parse <i class="fa fa-external-link fa-rotate-180"></i>
+          </md-button>
+          <md-button class="md-raised" ng-click="ypp.ExtHelloTx(findtx)">HelloTx <i class="fa fa-external-link"></i>
+          </md-button>
+          <md-button class="md-raised md-warn" ng-click="ypp.ExtBcInfoTx(findtx)">BCINFO <i class="fa fa-external-link"></i>
+          </md-button>
+        </div>
+      </form>
+    </md-card>
+    <md-card>
+        <div layout="row">
+            <div class="rowhead">
+                <md-button class="md-fab md-primary" aria-label="index">6</md-button>
+            </div>
+            <div>
+                <h2>Parse(OverlayOracle.Foo)</h2>
+            </div>
+        </div>
+        <form>
+            <md-text-float label="OP_RETURN Hex" ng-model="fr.orhex" class="long"></md-text-float>
+            <div class="row">
+                <md-text-float label="HashType" ng-model="fr.hashType"></md-text-float>
+                <md-text-float label="FileSize(bytes)" type="number" ng-model="fr.fileSize"></md-text-float>
+            </div>
+            <div class="row">
+                <md-text-float label="FileProof TagString" ng-model="fr.eidString"></md-text-float>
+                <md-text-float label="FileProof TagInt32" ng-model="fr.eidInt32"></md-text-float>
+            </div>
+            <md-text-float label="RIPEMD160(SHA2_256(v))" ng-model="fr.content" class="long"></md-text-float>
+        </form>
+    </md-card>
+  </div>
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.6/angular.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.6/angular-animate.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.6/angular-route.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.6/angular-aria.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.6/angular-resource.min.js"></script>
+  <script src="//0.y12.tw/js/hammer/2.0.4/hammer.min.js"></script>
+  <script src="//0.y12.tw/js/angular-material/0.6.1/angular-material.min.js"></script>
+  <script src="//0.y12.tw/js/dcodeIO/Long/2.2.3/Long.min.js"></script>
+  <script src="//0.y12.tw/js/dcodeIO/ByteBuffer/3.5.4/ByteBufferAB.min.js"></script>
+  <script src="//0.y12.tw/js/dcodeIO/ProtoBuf/3.8.1/ProtoBuf.min.js"></script>
+  <script src="//590c.org/js/bitcoinjs/1.4.2/bitcoinjs.min.js"></script>
+  <script src="app-v2.js"></script>
+  <script src="590c-v1412-alpha3.js"></script>
+  <script>
+    // Include app dependency on ngMaterial
+
+    angular.module('YourApp', ['ngMaterial', 'ngResource'])
+      .controller("YourController", ['$scope', '$resource', '$mdToast', function($scope, $resource, $mdToast) {
+        $scope.ypp = Ypp;
+
+        var reshbTx = $resource('https://mainnet.helloblock.io/v1/transactions/:tx');
+
+        $scope.findtx = '7194665acf9699a03d839f0401c18cafd3074055e2d6be1397f3d83ed1cd00bf';
+        $scope.fr = {};
+        $scope.v = {};
+        $scope.ext = {};
+
+        $scope.v.hash256 = '08D4CCF4F1269AD55F4F10672A6D53E2D7933D4444549CF341629AEAD9C7D368';
+        $scope.v.eidString = '590c.proto';
+        $scope.v.fileSize = 2452;
+        // http://pastebin.com/6gBKQShs
+        // http://goo.gl/QJMZ4u
+        $scope.v.eidInt32 = null;
+
+        var frInit = function() {
+          $scope.fr.content = 'NODATA';
+          $scope.fr.orhex = 'NODATA';
+          $scope.fr.num = 0;
+        }
+
+        $scope.gen = function() {
+          var v = $scope.v;
+          var hash160Sha256Hex = Y590c.toHash160WithSha256(v.hash256);
+          $scope.opr = Y590c.createFileProof(Y590c.OpReturn.HashType.SHA2_256_RIPEMD_160, hash160Sha256Hex, v.fileSize, v.eidString, v.eidInt32);
+        };
+
+        $scope.split = function() {
+          var diff = $scope.opr.orsize - 40;
+          if (diff > 0) {
+            var v = $scope.v;
+            var hash160Sha256Hex = Y590c.toHash160WithSha256(v.hash256);
+            var sr = 'Split ' + hash160Sha256Hex + ' to ';
+            var hash160HexSplit = hash160Sha256Hex.slice(0, (-2 * diff));
+            sr += hash160HexSplit;
+            $scope.opr = Y590c.createFileProof(Y590c.OpReturn.HashType.SHA2_256_RIPEMD_160, hash160HexSplit, v.fileSize, v.eidString, v.eidInt32);
+            $scope.opr.splitResult = sr;
+          }
+        };
+
+
+        $scope.toastPosition = {
+          bottom: false,
+          top: true,
+          left: false,
+          right: true
+        };
+
+        $scope.getToastPosition = function() {
+          return Object.keys($scope.toastPosition)
+            .filter(function(pos) {
+              return $scope.toastPosition[pos];
+            })
+            .join(' ');
+        };
+
+        var showSimpleToast = function(content) {
+          $mdToast.show(
+            $mdToast.simple()
+            .content(content)
+            .position($scope.getToastPosition())
+            .hideDelay(2000)
+          );
+        };
+
+        var handle590cMeta = function(obj) {
+          console.log(obj);
+          if (obj.type == Y590c.OpReturn.Type.FILE_PROOF) {
+            var v = obj.fileProof;
+            console.log(v);
+            $scope.fr.orhex = obj.orhex;
+            $scope.fr.content = v.hashValue.toHex();
+            $scope.fr.hashType = v.hashType == 1 ? 'RIPEMD160(SHA2_256(v))' : 'TODO';
+            $scope.fr.fileSize = v.fileSize;
+            $scope.fr.eidString = v.tagString;
+            $scope.fr.eidInt32 = v.tagInt32;
+          }
+        }
+
+        var cb = {};
+
+
+        cb.HelloSuccess = function(v) {
+          console.log(v);
+          showSimpleToast('HelloBlock.io api OK');
+          v.data.transaction.outputs.every(function(element, index, array) {
+            console.log(element);
+            if (element.value == 0 && element.scriptPubKey.indexOf('6a') == 0) {
+              // parse OP_RETURN
+              var obj = Y590c.ParseMetaData(element.scriptPubKey);
+              handle590cMeta(obj);
+              return false;
+            }
+            return true;
+          });
+        };
+
+        cb.HelloError = function(error) {
+          console.log('callback helloblock error!');
+          showSimpleToast('callback helloblock error!');
+          frInit();
+          //console.log(error);
+        };
+
+        $scope.parseOpReturnTx = function() {
+          var p = {
+            'tx': $scope.findtx
+          };
+          reshbTx.get(p, cb.HelloSuccess, cb.HelloError);
+        };
+        frInit();
+        console.log($scope);
+        //Ypp.foo = cb;
+      }]);
+  </script>
+
+</body>
+
+</html>

@@ -1,0 +1,30 @@
+package oracle590c;
+// version : oracle-alpha1-v1412
+message OverlayOracle {
+
+  enum Type {
+    FOO = 1;
+    BAR = 2;
+  }
+
+  message Foo {
+    optional string tagString = 1;
+    optional int32 tagInt32 = 2;
+    optional bytes tagBytes = 3;
+  }
+
+  message Bar {
+    optional string tagString = 1;
+    optional int32 tagInt32 = 2;
+    optional bytes tagBytes = 3;
+  }
+
+  required Type type = 1;
+  optional Foo foo = 2;
+  optional Bar bar = 3;
+  extensions 100 to 199;
+}
+
+extend OverlayOracle {
+   optional string haha = 101;
+}
