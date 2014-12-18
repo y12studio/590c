@@ -27,20 +27,26 @@
           <md-button class="md-fab md-primary" aria-label="index">1</md-button>
         </div>
         <div>
-          <h2>Provide the detail on op-return-inside-tx</h2>
+          <h2>Provide the OP_RETURN hex</h2>
         </div>
       </div>
       <form>
         <md-text-float label="OP_RETURN hex" ng-model="p.orhex" class="long"></md-text-float>
         <md-text-float label="Private Key(WIF)" ng-model="p.wif" class="long"></md-text-float>
+        <h3>Target Address</h3>
         <md-radio-group ng-model="donate.grp" ng-change="chDonateTarget()">
-          <md-radio-button value="1BtjAzWGLyAavUkbw3QsyzzNDKdtPXk95D" aria-label="Label 1">apache.org</md-radio-button>
-          <md-radio-button value="18129HkPNjxDvUDFFCpgGgGT2SaRnmYWyr">ISTScare.org</md-radio-button>
-          <md-radio-button value="13ZEruYoQg9s5HJisAPd2uqCYgQ9i7X5Eu">getaddr.bitnodes.io</md-radio-button>
-          <md-radio-button value="none" aria-label="Label 3">None</md-radio-button>
+          <md-radio-button value="none" aria-label="Label 3">Customize</md-radio-button>
+          <md-radio-button ng-repeat="donate in donateArr" value="{{donate}}" aria-label="{{donate.name}}">{{donate.name}}</md-radio-button>
         </md-radio-group>
         <md-text-float label="Target Address" ng-model="p.toAddr" class="long"></md-text-float>
-        <div class="row">
+        <div layout="row">
+          <span flex></span>
+          <md-button class="md-raised md-primary" ng-click="ypp.ExtGo(p.toUrl)">Check<i class="fa fa-external-link"></i>
+          </md-button>
+          <md-button class="md-raised md-warn" ng-click="ypp.ExtQr(p.toAddr)">BlockChain<i class="fa fa-external-link"></i>
+          </md-button>
+        </div>
+        <div layout="row">
           <md-text-float label="Target Value(satoshi)" type="number" ng-model="p.toSatoshi"></md-text-float>
           <md-text-float label="Tx Fee(satoshi)" type="number" ng-model="p.txfee"></md-text-float>
         </div>
@@ -98,16 +104,22 @@
   <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.6/angular-resource.min.js"></script>
   <script src="//0.y12.tw/js/hammer/2.0.4/hammer.min.js"></script>
   <script src="//0.y12.tw/js/angular-material/0.6.1/angular-material.min.js"></script>
-  <script src="app-v2.js"></script>
   <script src="//590c.org/js/bitcoinjs/1.4.2/bitcoinjs.min.js"></script>
+  <script src="app.js"></script>
   <script>
     // Include app dependency on ngMaterial
 
     angular.module('YourApp', ['ngMaterial', 'ngResource'])
       .controller("YourController", ['$scope', '$resource', '$mdToast', function($scope, $resource, $mdToast) {
         $scope.ypp = Ypp;
+        var resDonate = $resource('donate.json');
         var reshb = $resource('https://mainnet.helloblock.io/v1/addresses/:addr/unspents');
         var reshbTx = $resource('https://mainnet.helloblock.io/v1/transactions/:tx');
+
+        resDonate.query(null, function(arr) {
+          console.log(arr);
+          $scope.donateArr = arr;
+        }, null);
 
         var p = {};
         p.orhex = '590c080112220a18353930632e6f7267285e5f5e295461696368756e6740545710de0f1a03abcdef';
@@ -151,9 +163,12 @@
         };
 
         $scope.chDonateTarget = function() {
-          console.log('donate.grp=' + $scope.donate.grp);
+          console.log($scope.donate.grp);
           if ($scope.donate.grp != 'none') {
-            $scope.p.toAddr = $scope.donate.grp;
+            var obj = JSON.parse($scope.donate.grp);
+            console.log(obj);
+            $scope.p.toAddr = obj.addr;
+            $scope.p.toUrl = obj.url;
           } else {
             $scope.p.toAddr = null;
           }
@@ -197,7 +212,6 @@
           $scope.rtxHex = tx.toHex();
           console.log(tx);
         };
-
 
         $scope.toastPosition = {
           bottom: false,

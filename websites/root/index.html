@@ -21,7 +21,7 @@
   <div class="doc-content" ng-controller="YourController">
     <md-toolbar>
       <div class="md-toolbar-tools">
-        <span class="md-flex">0x 590c a.k.a. Y12</span>
+        <span class="md-flex">590c a.k.a. Y12</span>
         <span flex></span
         <md-button class="md-fab" aria-label="home">
             <md-icon icon="logo.svg" style="width: 36px; height: 36px;"></md-icon>
@@ -30,7 +30,10 @@
     </md-toolbar>
     <md-card>
       <h2>Bitcoin OP_RETRUN Protocol</h2>
-      <md-button class="md-raised md-warn" ng-click="ypp.NavGo('/v1412/')">v2014-12</md-button>
+      <div layout="row" layout-align="center" >
+      <md-button class="md-raised md-warn" ng-click="ypp.NavGo('/v1412/')">v2014-12 <i class="fa fa-btc"></i></md-button>
+      <md-button class="md-raised md-primary" ng-click="ypp.NavGo('sign.html')">Sign <i class="fa fa-pencil"></i></md-button>
+  </div>
     </md-card>
     <md-card>
       <h2>Protocol Buffers Spec.</h2>

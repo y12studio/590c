@@ -1,0 +1,17 @@
+[{
+  "name": "Apache Software Foundation",
+  "addr": "1BtjAzWGLyAavUkbw3QsyzzNDKdtPXk95D",
+  "url": "http://www.apache.org/foundation/contributing.html"
+}, {
+  "name": "Bitcoin Foundation",
+  "addr": "1BTCorgHwCg6u2YSAWKgS17qUad6kHmtQW",
+  "url": "https://bitcoinfoundation.org/about/donate/"
+}, {
+  "name": "ISTScare",
+  "addr": "18129HkPNjxDvUDFFCpgGgGT2SaRnmYWyr",
+  "url": "http://www.istscare.org/donate/"
+}, {
+  "name": "Bitnodes",
+  "addr": "13ZEruYoQg9s5HJisAPd2uqCYgQ9i7X5Eu",
+  "url": "https://getaddr.bitnodes.io/"
+}]
