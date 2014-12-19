@@ -1,4 +1,12 @@
 [{
+  "name": "590c.org #1",
+  "addr": "159ocW7srvaufS2WUtX31Q45z9XubeFEuW",
+  "url": "http://590c.org/"
+}, {
+  "name": "590c.org #2",
+  "addr": "159ocMZsk7DBmnMg12cMTVo5iFwHTE713d",
+  "url": "http://590c.org/"
+}, {
   "name": "Apache Software Foundation",
   "addr": "1BtjAzWGLyAavUkbw3QsyzzNDKdtPXk95D",
   "url": "http://www.apache.org/foundation/contributing.html"

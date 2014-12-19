@@ -30,9 +30,18 @@
           <h2>Provide the OP_RETURN hex</h2>
         </div>
       </div>
+      <md-text-float label="OP_RETURN hex" ng-model="p.orhex" class="long"></md-text-float>
+    </md-card>
+    <md-card>
+      <div layout="row">
+        <div class="rowhead">
+          <md-button class="md-fab md-primary" aria-label="index">2</md-button>
+        </div>
+        <div>
+          <h2>Provide the target's address</h2>
+        </div>
+      </div>
       <form>
-        <md-text-float label="OP_RETURN hex" ng-model="p.orhex" class="long"></md-text-float>
-        <md-text-float label="Private Key(WIF)" ng-model="p.wif" class="long"></md-text-float>
         <h3>Target Address</h3>
         <md-radio-group ng-model="donate.grp" ng-change="chDonateTarget()">
           <md-radio-button value="none" aria-label="Label 3">Customize</md-radio-button>
@@ -55,11 +64,17 @@
     <md-card>
       <div layout="row">
         <div class="rowhead">
-          <md-button class="md-fab md-primary" aria-label="index">2</md-button>
+          <md-button class="md-fab md-primary" aria-label="index">3</md-button>
         </div>
         <div>
-          <h2>Get Unspent tx</h2>
+          <h2>Provide the private key and Get the unspent tx</h2>
         </div>
+      </div>
+      <md-text-float label="Private Key(WIF)" ng-model="p.wif" class="long"></md-text-float>
+      <div class="row">
+        <span flex></span>
+        <md-button class="md-raised md-primary" ng-click="getAddrUnspent()">Get Unspent<i class="fa fa-external-link fa-rotate-180"></i>
+        </md-button>
       </div>
       <md-text-float label="Bitcoin Address" ng-model="tx.addr" class="long"></md-text-float>
       <div ng-repeat="tc in tcs">
@@ -69,20 +84,14 @@
           <md-text-float label="Tx Output index" type="number" ng-model="tc.index"></md-text-float>
         </div>
       </div>
-      <div class="row">
-        <span flex></span>
-        <md-button class="md-raised md-primary" ng-click="getAddrUnspent()">Get Unspent<i class="fa fa-external-link fa-rotate-180"></i>
-        </md-button>
-      </div>
-
     </md-card>
     <md-card>
       <div layout="row">
         <div class="rowhead">
-          <md-button class="md-fab md-primary" aria-label="index">3</md-button>
+          <md-button class="md-fab md-primary" aria-label="index">4</md-button>
         </div>
         <div>
-          <h2>Sign</h2>
+          <h2>Sign the transcation</h2>
         </div>
       </div>
       <div layout="row">
