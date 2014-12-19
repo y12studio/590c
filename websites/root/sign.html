@@ -3,6 +3,7 @@
 
 <head>
   <meta charset="utf-8">
+  <title>0x590c - Sign</title>
   <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
   <link rel="stylesheet" href="//0.y12.tw/js/angular-material/0.6.1/angular-material.min.css">
   <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
@@ -119,7 +120,10 @@
     // Include app dependency on ngMaterial
 
     angular.module('YourApp', ['ngMaterial', 'ngResource'])
-      .controller("YourController", ['$scope', '$resource', '$mdToast', function($scope, $resource, $mdToast) {
+      .config(function($locationProvider) {
+        $locationProvider.html5Mode(false).hashPrefix('!');
+      })
+      .controller("YourController", ['$scope', '$location', '$resource', '$mdToast', function($scope, $location, $resource, $mdToast) {
         $scope.ypp = Ypp;
         var resDonate = $resource('donate.json');
         var reshb = $resource('https://mainnet.helloblock.io/v1/addresses/:addr/unspents');
@@ -245,6 +249,18 @@
             .hideDelay(2000)
           );
         };
+
+        $scope.$on("$locationChangeSuccess", function(event) {
+          console.log($location);
+          //var pathlen = $location.path().length;
+          var wifTmp = $location.path().slice(1);
+          try {
+            var key = bitcoin.ECKey.fromWIF(wifTmp);
+            $scope.p.wif = wifTmp;
+          } catch (err) {
+            console.log(err);
+          }
+        });
 
         console.log($scope);
         //Ypp.foo = cb;
