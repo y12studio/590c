@@ -1,10 +1,14 @@
 var Y590c = function() {};
 
 Y590c.OpReturn = dcodeIO.ProtoBuf.loadProtoFile("590c-v1412-alpha3.proto").build('org590c.OpReturn');
+Y590c.Oracle = dcodeIO.ProtoBuf.loadProtoFile("oracle-v1412-alpha1.proto").build('org590c.OverlayOracle');
 
-Y590c.PbPost = function(pbobj) {
-    pbobj.orhex = '590c' + pbobj.toHex();
-    pbobj.orsize = pbobj.orhex.length / 2;
+Y590c.PbPost = function(pb) {
+    pb.orhex = '590c' + pb.toHex();
+    pb.orbase64 = '590c' + pb.toBase64();
+    pb.orsize = pb.orhex.length / 2;
+    // hash160
+    pb.orhash160 = Y590c.toHash160AndSha256(pb.toHex());
 };
 
 Y590c.PbParsePre = function(hexStr) {
@@ -19,6 +23,7 @@ Y590c.PbParsePre = function(hexStr) {
 Y590c.PbPrint = function(pbobj) {
     console.log(pbobj);
     console.log('hex=' + pbobj.toHex());
+    console.log('base64=' + pbobj.toBase64());
     console.log('calculate size = ' + pbobj.calculate());
     console.log('result hex = ' + pbobj.orhex);
     console.log('result size = ' + pbobj.orsize);
@@ -73,6 +78,23 @@ Y590c.createTag = function(tagString, tagInt32, tagBytes) {
     return r;
 }
 
+Y590c.createOracleFoo = function(tagString, tagInt32) {
+    var r = new Y590c.Oracle(Y590c.Oracle.Type.FOO);
+    var tag = new Y590c.Oracle.Foo();
+
+    if (tagInt32 != null) {
+        tag.tagInt32 = tagInt32;
+    }
+
+    if (tagString != null) {
+        tag.tagString = tagString;
+    }
+    r.tag = tag;
+    Y590c.PbPost(r);
+    Y590c.PbPrint(r);
+    return r;
+}
+
 Y590c.toHash160WithSha256 = function(hash256Hex) {
     // https://github.com/bitcoinjs/bitcoinjs-lib/blob/master/src/script.js
     var bjsBuffer = bitcoin.Script.fromHex(hash256Hex).toBuffer();
@@ -81,12 +103,21 @@ Y590c.toHash160WithSha256 = function(hash256Hex) {
     return bf.toString('hex');
 }
 
+Y590c.toHash160AndSha256 = function(targetHex) {
+    // https://github.com/bitcoinjs/bitcoinjs-lib/blob/master/src/script.js
+    var bjsBuffer = bitcoin.Script.fromHex(targetHex).toBuffer();
+    // https://github.com/bitcoinjs/bitcoinjs-lib/blob/master/src/crypto.js
+    // hash160 = ripemd160(sha256(buffer))
+    var bf = bitcoin.crypto.hash160(bjsBuffer);
+    return bf.toString('hex');
+}
+
 Y590c.createFileProof = function(hashType, hash160Sha256Hex, fileSize, tagString, tagInt32) {
     var r = new Y590c.OpReturn(Y590c.OpReturn.Type.FILE_PROOF);
     console.log('RIPEMD160(SHA2_256(v))=' + hash160Sha256Hex);
     var dBufHash = dcodeIO.ByteBuffer.fromHex(hash160Sha256Hex);
     var fr = new Y590c.OpReturn.FileProof(hashType, dBufHash, fileSize);
-    
+
     if (tagString) {
         fr.tagString = tagString;
     }

@@ -31,18 +31,17 @@
           <h2>Get RIPEMD160(SHA2-256(OverlayOracle.Foo))</h2>
         </div>
       </div>
-      <form>
-        <div class="row">
-          <md-text-float label="Foo String" ng-model="foo.tagString"></md-text-float>
-          <md-text-float label="Foo Integer" type="number" ng-model="foo.tagInt32"></md-text-float>
-          <span flex></span>
-          <md-button class="md-raised" ng-click="gen()">Build <i class="fa fa-gears"></i>
-          </md-button>
-        </div>
-        <md-text-float label="size(OverlayOracle.Foo)" ng-model="foo.hex"></md-text-float>
-        <md-text-float label="hex(OverlayOracle.Foo)" ng-model="foo.hex" class="long"></md-text-float>
-        <md-text-float label="RIPEMD160(SHA2_256(OverlayOracle.Foo)) hex" ng-model="opr.hash160" class="long"></md-text-float>
-      </form>
+      <md-text-float label="Foo String" ng-model="foo.tagString" class="long"></md-text-float>
+      <md-text-float label="Foo Integer" type="number" ng-model="foo.tagInt32"></md-text-float>
+      <div layout="row" layout-align="end">
+        <md-button class="md-raised" ng-click="genFoo()">Build <i class="fa fa-gears"></i>
+        </md-button>
+      </div>
+      <md-text-float label="size(OverlayOracle.Foo)" ng-model="foo.r.orsize"></md-text-float>
+      <md-text-float label="0x590c+hex(OverlayOracle.Foo)" ng-model="foo.r.orhex" class="long"></md-text-float>
+      <md-text-float label="0x590c+base64(OverlayOracle.Foo)" ng-model="foo.r.orbase64" class="long"></md-text-float>
+      <md-text-float label="RIPEMD160(SHA2_256(OverlayOracle.Foo)) hex" ng-model="foo.r.orhash160" class="long"></md-text-float>
+      <md-text-float label="goo.gl target url" ng-model="foo.r.googl" class="long"></md-text-float>
     </md-card>
     <md-card>
       <div layout="row">
@@ -50,37 +49,16 @@
           <md-button class="md-fab md-primary" aria-label="index">2</md-button>
         </div>
         <div>
-          <h2>Get base64(OverlayOracle.Foo)</h2>
-        </div>
-      </div>
-      <form>
-        <div class="row">
-          <span flex></span>
-          <md-button class="md-raised" ng-click="gen()">Build <i class="fa fa-gears"></i>
-          </md-button>
-        </div>
-        <md-text-float label="base64(OverlayOracle.Foo)" ng-model="foo.base64" class="long"></md-text-float>
-        <md-text-float label="goo.gl target url http://590c.org/#base64" ng-model="opr.hash160" class="long"></md-text-float>
-      </form>
-    </md-card>
-    <md-card>
-      <div layout="row">
-        <div class="rowhead">
-          <md-button class="md-fab md-primary" aria-label="index">3</md-button>
-        </div>
-        <div>
           <h2>Get goo.gl short url</h2>
         </div>
       </div>
       <form>
         <div class="row">
-
           <span flex></span>
-          <md-button class="md-raised" ng-click="gen()">Build <i class="fa fa-gears"></i>
+          <md-button class="md-raised" ng-click="genGoogl()">Build <i class="fa fa-gears"></i>
           </md-button>
         </div>
-        <md-text-float label="goo.gl short url id" ng-model="opr.hash160"></md-text-float>
-        <md-text-float label="goo.gl short url" ng-model="opr.hash160" class="long"></md-text-float>
+        <md-text-float label="goo.gl short url id" ng-model="googl.id"></md-text-float>
       </form>
     </md-card>
     <md-card>
@@ -147,33 +125,33 @@
       </form>
     </md-card>
     <md-card>
-        <div layout="row">
-            <div class="rowhead">
-                <md-button class="md-fab md-primary" aria-label="index">6</md-button>
-            </div>
-            <div>
-                <h2>Parse(OverlayOracle.Foo)</h2>
-            </div>
+      <div layout="row">
+        <div class="rowhead">
+          <md-button class="md-fab md-primary" aria-label="index">6</md-button>
         </div>
-        <form>
-            <md-text-float label="OP_RETURN Hex" ng-model="fr.orhex" class="long"></md-text-float>
-            <div class="row">
-                <md-text-float label="HashType" ng-model="fr.hashType"></md-text-float>
-                <md-text-float label="FileSize(bytes)" type="number" ng-model="fr.fileSize"></md-text-float>
-            </div>
-            <div class="row">
-                <md-text-float label="FileProof TagString" ng-model="fr.eidString"></md-text-float>
-                <md-text-float label="FileProof TagInt32" ng-model="fr.eidInt32"></md-text-float>
-            </div>
-            <md-text-float label="RIPEMD160(SHA2_256(v))" ng-model="fr.content" class="long"></md-text-float>
-        </form>
+        <div>
+          <h2>Parse(OverlayOracle.Foo)</h2>
+        </div>
+      </div>
+      <form>
+        <md-text-float label="OP_RETURN Hex" ng-model="fr.orhex" class="long"></md-text-float>
+        <div class="row">
+          <md-text-float label="HashType" ng-model="fr.hashType"></md-text-float>
+          <md-text-float label="FileSize(bytes)" type="number" ng-model="fr.fileSize"></md-text-float>
+        </div>
+        <div class="row">
+          <md-text-float label="FileProof TagString" ng-model="fr.eidString"></md-text-float>
+          <md-text-float label="FileProof TagInt32" ng-model="fr.eidInt32"></md-text-float>
+        </div>
+        <md-text-float label="RIPEMD160(SHA2_256(v))" ng-model="fr.content" class="long"></md-text-float>
+      </form>
     </md-card>
   </div>
-  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.6/angular.min.js"></script>
-  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.6/angular-animate.min.js"></script>
-  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.6/angular-route.min.js"></script>
-  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.6/angular-aria.min.js"></script>
-  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.6/angular-resource.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.8/angular.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.8/angular-animate.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.8/angular-route.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.8/angular-aria.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.8/angular-resource.min.js"></script>
   <script src="//0.y12.tw/js/hammer/2.0.4/hammer.min.js"></script>
   <script src="//0.y12.tw/js/angular-material/0.6.1/angular-material.min.js"></script>
   <script src="//590c.org/js/dcodeIO/Long/2.2.3/Long.min.js"></script>
@@ -192,6 +170,12 @@
         var reshbTx = $resource('https://mainnet.helloblock.io/v1/transactions/:tx');
 
         $scope.findtx = '7194665acf9699a03d839f0401c18cafd3074055e2d6be1397f3d83ed1cd00bf';
+        $scope.foo = {
+          'tagString': 'Hello Bitcoin With Cryptography We Trust! TAICHUNG',
+          'tagInt32': 123
+        };
+        $scope.googl = {};
+
         $scope.fr = {};
         $scope.v = {};
         $scope.ext = {};
@@ -209,10 +193,24 @@
           $scope.fr.num = 0;
         }
 
-        $scope.gen = function() {
-          var v = $scope.v;
-          var hash160Sha256Hex = Y590c.toHash160WithSha256(v.hash256);
-          $scope.opr = Y590c.createFileProof(Y590c.OpReturn.HashType.SHA2_256_RIPEMD_160, hash160Sha256Hex, v.fileSize, v.eidString, v.eidInt32);
+        $scope.genFoo = function() {
+          $scope.foo.r = Y590c.createTag($scope.foo.tagString, $scope.foo.tagInt32);
+          $scope.foo.r.googl = 'http://590c.org/#!' + $scope.foo.r.orbase64;
+        };
+
+        $scope.genGoogl = function() {
+            // Shorten
+            var Googl = $resource('https://www.googleapis.com/urlshortener/v1/url', {}, {
+                shorten: {
+                    method: 'POST'
+                }
+            });
+            // {"longUrl": "http://www.google.com/"}
+
+            Googl.shorten(null, {longUrl: $scope.foo.r.googl},function(v){
+                console.log(v);
+                $scope.googl = v;
+            });
         };
 
         $scope.split = function() {
