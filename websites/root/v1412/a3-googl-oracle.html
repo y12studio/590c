@@ -52,44 +52,31 @@
           <h2>Get goo.gl short url</h2>
         </div>
       </div>
-      <form>
-        <div class="row">
-          <span flex></span>
-          <md-button class="md-raised" ng-click="genGoogl()">Build <i class="fa fa-gears"></i>
-          </md-button>
-        </div>
-        <md-text-float label="goo.gl short url id" ng-model="googl.id"></md-text-float>
-      </form>
+
+      <div layout="row" layout-align="end">
+        <md-button class="md-raised" ng-click="genGoogl()">Request <i class="fa fa-gears"></i>
+        </md-button>
+      </div>
+      <md-text-float label="goo.gl short url id" ng-model="googl.id"></md-text-float>
+
     </md-card>
     <md-card>
       <div layout="row">
         <div class="rowhead">
-          <md-button class="md-fab md-primary" aria-label="index">4</md-button>
+          <md-button class="md-fab md-primary" aria-label="index">3</md-button>
         </div>
         <div>
           <h2>Build(OpReturn.FileProofUrl)</h2>
         </div>
       </div>
-      <form>
-        <md-text-float label="SHA2-256 Hex String(*)" ng-model="v.hash256" class="long"></md-text-float>
-        <div class="row">
-          <md-text-float label="File Size Bytes(*)" type="number" ng-model="v.fileSize"></md-text-float>
-          <md-text-float label="Tag String" ng-model="v.eidString"></md-text-float>
-          <md-text-float label="Tag Integer" type="number" ng-model="v.eidInt32"></md-text-float>
-          <span flex></span>
-          <md-button class="md-raised" ng-click="gen()">Build <i class="fa fa-gears"></i>
-          </md-button>
-        </div>
-        <md-text-float label="RIPEMD160(SHA2_256(v))" ng-model="opr.hash160Hex" class="long"></md-text-float>
-        <md-text-float label="OP_RETURN hex" ng-model="opr.orhex" class="long"></md-text-float>
-        <div class="row">
-          <md-text-float label="OP_RETURN size(Max 40bytes)" ng-model="opr.orsize"></md-text-float>
-          <span flex></span>
-          <md-button class="md-raised" ng-click="split()">Split <i class="fa fa-cut"></i>
-          </md-button>
-        </div>
-        <p>{{opr.splitResult}}</p>
-      </form>
+
+      <div layout="row" layout-align="end">
+        <md-button class="md-raised" ng-click="genFileProofUrl()">Build <i class="fa fa-gears"></i>
+        </md-button>
+      </div>
+      <md-text-float label="OP_RETURN Raw Hex ({{orhex.rawSize}} bytes)" ng-model="orhex.rawHex" class="long"></md-text-float>
+      <md-text-float label="OP_RETURN Result Hex ({{orhex.resultSize}} bytes)" ng-model="orhex.resultHex" class="long"></md-text-float>
+
 
     </md-card>
     <md-card>
@@ -109,10 +96,11 @@
           <md-text-float label="FileSize(bytes)" type="number" ng-model="fr.fileSize"></md-text-float>
         </div>
         <div class="row">
-          <md-text-float label="FileProof TagString" ng-model="fr.eidString"></md-text-float>
-          <md-text-float label="FileProof TagInt32" ng-model="fr.eidInt32"></md-text-float>
+          <md-text-float label="FileProofUrl extType" ng-model="fr.extType"></md-text-float>
+          <md-text-float label="FileProofUrl urlId" ng-model="fr.urlId"></md-text-float>
         </div>
-        <md-text-float label="RIPEMD160(SHA2_256(v))" ng-model="fr.content" class="long"></md-text-float>
+        <md-text-float label="RIPEMD160(SHA2_256(v))" ng-model="fr.hash160" class="long"></md-text-float>
+        <md-text-float label="Target url" ng-model="fr.url" class="long"></md-text-float>
         <div class="row">
           <span flex></span>
           <md-button class="md-raised md-primary" ng-click="parseOpReturnTx()">Get/Parse <i class="fa fa-external-link fa-rotate-180"></i>
@@ -133,18 +121,15 @@
           <h2>Parse(OverlayOracle.Foo)</h2>
         </div>
       </div>
-      <form>
-        <md-text-float label="OP_RETURN Hex" ng-model="fr.orhex" class="long"></md-text-float>
-        <div class="row">
-          <md-text-float label="HashType" ng-model="fr.hashType"></md-text-float>
-          <md-text-float label="FileSize(bytes)" type="number" ng-model="fr.fileSize"></md-text-float>
-        </div>
-        <div class="row">
-          <md-text-float label="FileProof TagString" ng-model="fr.eidString"></md-text-float>
-          <md-text-float label="FileProof TagInt32" ng-model="fr.eidInt32"></md-text-float>
-        </div>
-        <md-text-float label="RIPEMD160(SHA2_256(v))" ng-model="fr.content" class="long"></md-text-float>
-      </form>
+      <div layout="row" layout-align="end">
+          <md-button class="md-raised" ng-click="expandGoogl()">Request <i class="fa fa-gears"></i>
+          </md-button>
+      </div>
+      <md-text-float label="goo.gl longUrl" ng-model="googlexp.longUrl" class="long"></md-text-float>
+      <md-text-float label="base64" ng-model="googlexp.base64" class="long"></md-text-float>
+      <md-text-float label="OverlayOracle.foo size" ng-model="googlexp.oracleSize"></md-text-float>
+      <md-text-float label="OverlayOracle.foo.tagString" ng-model="googlexp.oracle.foo.tagString" class="long"></md-text-float>
+      <md-text-float label="OverlayOracle.foo.tagInt32" ng-model="googlexp.oracle.foo.tagInt32"></md-text-float>
     </md-card>
   </div>
   <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.8/angular.min.js"></script>
@@ -169,12 +154,13 @@
 
         var reshbTx = $resource('https://mainnet.helloblock.io/v1/transactions/:tx');
 
-        $scope.findtx = '7194665acf9699a03d839f0401c18cafd3074055e2d6be1397f3d83ed1cd00bf';
+        $scope.findtx = '9c5a4af02a20aa8cbe4fdc45c574b990d55c297d08a697ee2b0589af78b8fc25';
         $scope.foo = {
           'tagString': 'Hello Bitcoin With Cryptography We Trust! TAICHUNG',
           'tagInt32': 123
         };
         $scope.googl = {};
+        $scope.orhex = {};
 
         $scope.fr = {};
         $scope.v = {};
@@ -193,39 +179,61 @@
           $scope.fr.num = 0;
         }
 
+        var GOOGL_PREFIX = 'http://590c.org/v1412#!/';
+
         $scope.genFoo = function() {
-          $scope.foo.r = Y590c.createTag($scope.foo.tagString, $scope.foo.tagInt32);
-          $scope.foo.r.googl = 'http://590c.org/#!' + $scope.foo.r.orbase64;
+          $scope.foo.r = Y590c.createOracleFoo($scope.foo.tagString, $scope.foo.tagInt32);
+          $scope.foo.r.googl = GOOGL_PREFIX + $scope.foo.r.orbase64;
         };
+
+        // Shorten
+        var Googl = $resource('https://www.googleapis.com/urlshortener/v1/url', {}, {
+            shorten: {
+              method: 'POST'
+            }
+         });
+
+         // Shorten
 
         $scope.genGoogl = function() {
-            // Shorten
-            var Googl = $resource('https://www.googleapis.com/urlshortener/v1/url', {}, {
-                shorten: {
-                    method: 'POST'
-                }
-            });
-            // {"longUrl": "http://www.google.com/"}
+          // {"longUrl": "http://www.google.com/"}
+          Googl.shorten(null, {
+            longUrl: $scope.foo.r.googl
+          }, function(v) {
+            console.log(v);
+            $scope.googl = v;
+          });
+        };
 
-            Googl.shorten(null, {longUrl: $scope.foo.r.googl},function(v){
-                console.log(v);
-                $scope.googl = v;
+        $scope.expandGoogl = function() {
+            // expand
+            var Googl = $resource('https://www.googleapis.com/urlshortener/v1/url?shortUrl='+$scope.fr.url);
+
+            Googl.get(null, function(v) {
+                var r = {};
+                r.base64 = v.longUrl.replace(GOOGL_PREFIX+'590c','');
+                r.oracle = Y590c.ParseOracle(r.base64);
+                r.longUrl = v.longUrl;
+                r.oracleSize = r.oracle.calculate();
+                $scope.googlexp = r;
+                console.log(r);
             });
         };
 
-        $scope.split = function() {
-          var diff = $scope.opr.orsize - 40;
+        $scope.genFileProofUrl = function() {
+          var googlId = $scope.googl.id.replace('http://goo.gl/', '');
+          var foor = $scope.foo.r;
+          var pb = Y590c.createFileProofUrlGoogl(Y590c.OpReturn.HashType.SHA2_256_RIPEMD_160, foor.orhash160, foor.orsize, googlId);
+          $scope.orhex.rawHex = pb.orhex;
+          $scope.orhex.rawSize = pb.orsize;
+          var diff = pb.orsize - 40;
           if (diff > 0) {
-            var v = $scope.v;
-            var hash160Sha256Hex = Y590c.toHash160WithSha256(v.hash256);
-            var sr = 'Split ' + hash160Sha256Hex + ' to ';
-            var hash160HexSplit = hash160Sha256Hex.slice(0, (-2 * diff));
-            sr += hash160HexSplit;
-            $scope.opr = Y590c.createFileProof(Y590c.OpReturn.HashType.SHA2_256_RIPEMD_160, hash160HexSplit, v.fileSize, v.eidString, v.eidInt32);
-            $scope.opr.splitResult = sr;
+            var hexReduce = foor.orhash160.slice(0, (-2 * diff));
+            var pb2 = Y590c.createFileProofUrlGoogl(Y590c.OpReturn.HashType.SHA2_256_RIPEMD_160, hexReduce, foor.orsize, googlId);
+            $scope.orhex.resultHex = pb2.orhex;
+            $scope.orhex.resultSize = pb2.orsize;
           }
         };
-
 
         $scope.toastPosition = {
           bottom: false,
@@ -253,15 +261,18 @@
 
         var handle590cMeta = function(obj) {
           console.log(obj);
-          if (obj.type == Y590c.OpReturn.Type.FILE_PROOF) {
-            var v = obj.fileProof;
+          if (obj.type == Y590c.OpReturn.Type.FILE_PROOF_URL) {
+            var v = obj.fileProofUrl;
             console.log(v);
             $scope.fr.orhex = obj.orhex;
-            $scope.fr.content = v.hashValue.toHex();
+            $scope.fr.hash160 = v.hashValue.toHex();
             $scope.fr.hashType = v.hashType == 1 ? 'RIPEMD160(SHA2_256(v))' : 'TODO';
             $scope.fr.fileSize = v.fileSize;
-            $scope.fr.eidString = v.tagString;
-            $scope.fr.eidInt32 = v.tagInt32;
+            $scope.fr.urlId = v.urlId;
+            if (v.extType == Y590c.OpReturn.ExtType.GOOGL_ORACLE) {
+              $scope.fr.extType = 'goo.gl oracle';
+              $scope.fr.url = 'http://goo.gl/' + v.urlId;
+            }
           }
         }
 

@@ -48,6 +48,12 @@ Y590c.ParseMetaData = function(scriptHex) {
     return r;
 }
 
+Y590c.ParseOracle = function(base64Str) {
+    var dBuf = dcodeIO.ByteBuffer.fromBase64(base64Str);
+    var r = Y590c.Oracle.decode(dBuf);
+    return r;
+}
+
 Y590c.handleMeta = function(obj) {
     console.log(obj);
     var r = {};
@@ -79,17 +85,18 @@ Y590c.createTag = function(tagString, tagInt32, tagBytes) {
 }
 
 Y590c.createOracleFoo = function(tagString, tagInt32) {
+    console.log(Y590c.Oracle.Type.FOO);
     var r = new Y590c.Oracle(Y590c.Oracle.Type.FOO);
-    var tag = new Y590c.Oracle.Foo();
+    var foo = new Y590c.Oracle.Foo();
 
     if (tagInt32 != null) {
-        tag.tagInt32 = tagInt32;
+        foo.tagInt32 = tagInt32;
     }
 
     if (tagString != null) {
-        tag.tagString = tagString;
+        foo.tagString = tagString;
     }
-    r.tag = tag;
+    r.foo = foo;
     Y590c.PbPost(r);
     Y590c.PbPrint(r);
     return r;
@@ -127,6 +134,18 @@ Y590c.createFileProof = function(hashType, hash160Sha256Hex, fileSize, tagString
 
     r.fileProof = fr;
     r.hash160Hex = hash160Sha256Hex;
+    Y590c.PbPost(r);
+    Y590c.PbPrint(r);
+    return r;
+}
+
+Y590c.createFileProofUrlGoogl = function(hashType, hash160Hex, fileSize, googlId) {
+    var r = new Y590c.OpReturn(Y590c.OpReturn.Type.FILE_PROOF_URL);
+    var dBufHash = dcodeIO.ByteBuffer.fromHex(hash160Hex);
+    var fr = new Y590c.OpReturn.FileProofUrl(hashType, dBufHash, fileSize,Y590c.OpReturn.ExtType.GOOGL_ORACLE,googlId);
+
+    r.fileProofUrl = fr;
+    r.hash160Hex = hash160Hex;
     Y590c.PbPost(r);
     Y590c.PbPrint(r);
     return r;

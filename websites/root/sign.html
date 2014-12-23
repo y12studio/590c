@@ -49,20 +49,32 @@
           <md-radio-button ng-repeat="donate in donateArr" value="{{donate}}" aria-label="{{donate.name}}">{{donate.name}}</md-radio-button>
         </md-radio-group>
         <md-text-float label="Target Address" ng-model="p.toAddr" class="long"></md-text-float>
+        <md-text-float label="Target Value(satoshi)" type="number" ng-model="p.toSatoshi"></md-text-float>
         <div layout="row">
           <span flex></span>
-          <md-button class="md-raised md-primary" ng-click="ypp.ExtGo(p.toUrl)">Check<i class="fa fa-external-link"></i>
+          <md-button class="md-raised" ng-click="addTargetAddr()">Add <i class="fa fa-plus-square"></i>
           </md-button>
-          <md-button class="md-raised md-warn" ng-click="ypp.ExtQr(p.toAddr)">BlockChain<i class="fa fa-external-link"></i>
+          <md-button class="md-raised md-primary" ng-click="ypp.ExtGo(p.toUrl)">Check <i class="fa fa-external-link"></i>
+          </md-button>
+          <md-button class="md-raised md-warn" ng-click="ypp.ExtQr(p.toAddr)">BlockChain <i class="fa fa-external-link"></i>
           </md-button>
         </div>
+        <div layout="row" ng-repeat="tp in tps">
+          <div style="margin-right:1em;width:360px;">{{tp.toUrl}}
+            <BR/><span style="color:#aaaaaa;font-size:0.5em;margin-right:2em;">{{tp.toAddr}}</span><span style="font-size:0.8em;">{{tp.toSatoshi}}</span>
+          </div>
+        </div>
         <div layout="row">
-          <md-text-float label="Target Value(satoshi)" type="number" ng-model="p.toSatoshi"></md-text-float>
+          <md-text-float label="Total Value(satoshi)" type="number" ng-model="totalSatoshi"></md-text-float>
           <md-text-float label="Tx Fee(satoshi)" type="number" ng-model="p.txfee"></md-text-float>
         </div>
       </form>
     </md-card>
     <md-card>
+      <div style="text-align:center;">
+        <h2>AT YOUR OWN RISK</h2>
+        <img width="360" src="/img/caution-v1412.svg"></img>
+      </div>
       <div layout="row">
         <div class="rowhead">
           <md-button class="md-fab md-primary" aria-label="index">3</md-button>
@@ -72,8 +84,7 @@
         </div>
       </div>
       <md-text-float label="Private Key(WIF)" ng-model="p.wif" class="long"></md-text-float>
-      <div class="row">
-        <span flex></span>
+      <div layout="row" layout-align="end">
         <md-button class="md-raised md-primary" ng-click="getAddrUnspent()">Get Unspent<i class="fa fa-external-link fa-rotate-180"></i>
         </md-button>
       </div>
@@ -95,11 +106,9 @@
           <h2>Sign the transcation</h2>
         </div>
       </div>
-      <div layout="row">
-        <span flex></span>
+      <div layout="row" layout-align="end">
         <md-button class="md-raised md-warn" ng-click="signOpReturn()">Sign <i class="fa fa-key"></i>
         </md-button>
-
         <md-button class="md-raised" ng-click="ypp.ExtBroadcast()">Broadcast <i class="fa fa-external-link"></i>
         </md-button>
       </div>
@@ -135,12 +144,14 @@
         }, null);
 
         var p = {};
+        $scope.tps = [];
         p.orhex = '590c080112220a18353930632e6f7267285e5f5e295461696368756e6740545710de0f1a03abcdef';
         p.txfee = 1059;
         p.wif = '';
         //p.toAddr = null;
         p.toAddr = '';
         p.toSatoshi = 38168;
+        $scope.totalSatoshi = 0;
         $scope.p = p;
         $scope.tx = {};
 
@@ -187,6 +198,16 @@
           }
         };
 
+        $scope.addTargetAddr = function() {
+          var r = angular.copy($scope.p);
+          console.log(r);
+          $scope.tps.push(r);
+          console.log($scope.tps);
+          $scope.totalSatoshi += r.toSatoshi;
+          console.log($scope.p);
+
+        };
+
         $scope.signOpReturn = function() {
 
           var p = $scope.p;
@@ -202,15 +223,15 @@
             totalUnspent += tc.value;
           });
 
+          var totalSend = 0;
 
-          if (p.toAddr != null && p.toSatoshi > 0) {
-            //
-            txb.addOutput(p.toAddr, p.toSatoshi);
-            txb.addOutput(stx.addr, totalUnspent - p.toSatoshi - p.txfee);
-          } else {
-            // change back
-            txb.addOutput(stx.addr, totalUnspent - p.txfee);
-          }
+          $scope.tps.forEach(function(tp, index, array) {
+            txb.addOutput(tp.toAddr, tp.toSatoshi);
+            totalSend += tp.toSatoshi;
+          });
+
+          txb.addOutput(stx.addr, totalUnspent - totalSend - p.txfee);
+
 
           var dataScript = bitcoin.Script.fromASM('OP_RETURN ' + p.orhex);
 
@@ -257,6 +278,7 @@
           try {
             var key = bitcoin.ECKey.fromWIF(wifTmp);
             $scope.p.wif = wifTmp;
+            $scope.getAddrUnspent();
           } catch (err) {
             console.log(err);
           }

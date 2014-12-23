@@ -1,4 +1,4 @@
-package oracle590c;
+package org590c;
 // version : oracle-alpha1-v1412
 message OverlayOracle {
 
