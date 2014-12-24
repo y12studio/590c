@@ -1,0 +1,94 @@
+package org590c;
+// version : alpha4-v1412
+message OpReturn {
+
+  enum Type {
+    TAG = 1;
+    FILE_PROOF = 2;
+    FILE_PROOF_URL = 3;
+    WWW = 4;
+    CHUNK = 11;
+    ASSET_GENESIS     = 31;
+    ASSET_TRANSCATION = 32;
+    COMMON_ARRAY = 90;
+  }
+
+  enum HashType {
+    SHA2_256_RIPEMD_160 = 1;
+    SHA2_256_SHA2_256 = 2;
+    SHA3_256_RIPEMD_160 = 3;
+    SHA3_256_SHA3_256 = 4;
+    SHA2_256=21;
+    SHA2_384=22;
+    SHA2_512=23;
+    SHA3_256=31;
+    SHA3_384=32;
+    SHA3_512=33;
+    RIPEMD_128=51;
+    RIPEMD_160=52;
+    RIPEMD_256=53;
+    RIPEMD_320=54;
+  }
+
+  message Tag {
+    optional string tagString = 1;
+    optional int32 tagInt32 = 2;
+    optional bytes tagBytes = 3;
+  }
+
+  message FileProof {
+    required HashType hashType = 1;
+    required bytes hashValue = 2;
+    required int32 fileSize = 3;
+    optional string tagString = 4;
+    optional int32 tagInt32 = 5;
+  }
+
+  enum ExtType {
+    RAW_URL = 1;            //  [http|https]://[urlString]/org590c.[json|txt|png|jpg|pdf|doc|proto]
+    RAW_URL_HASH = 2;       //  [http|https]://[urlString]/[hashHexValue].[json|txt|png|jpg|pdf|doc|proto]
+    ORG_590C = 11;          //  590c.org/ext/[urlId]
+    ORG_590C_ORACLE = 12;   //  590c.org/ext-oracle/[urlId]
+    GOOGL = 21;             //  http://goo.gl/[urlId]
+    GOOGL_ORACLE = 22;      //  https://www.googleapis.com/urlshortener/v1/url?shortUrl=http://goo.gl/[urlId]
+    BITLY = 52;             //  http://bit.ly/[urlId]
+    PASTEBIN = 53;          //  http://pastebin.com/[urlId]
+    PASTIE = 54;            //  http://pastie.org/[urlId]
+    GITHUB_RAW = 55;        //  https://raw.githubusercontent.com/[urlId]
+  }
+
+   message FileProofUrl {
+    required HashType hashType = 1;
+    required bytes hashValue = 2;
+    required int32 fileSize = 3;
+    required ExtType extType = 4;
+    required string urlId = 5;
+  }
+
+   message RefBlock {
+    required int32 blockHeight = 1;
+    required int32 txIndex = 2;
+  }
+
+  message Www {
+    // optional Where where = 1;
+    required int64 when = 1; // 1417520051 = Tue, 02 Dec 2014 11:34:11 GMT
+    required double lat = 2; // 24.1321302
+    required double lon = 3; // 120.6962365
+    optional string whatString = 4;
+    optional int32 whatInt = 5;
+    optional ExtType wahtExtType = 6;
+    optional string wahtExtId = 7;
+  }
+
+  required Type type = 1;
+  optional Tag tag = 2;
+  optional FileProof fileProof = 3;
+  optional FileProofUrl fileProofUrl = 4;
+  optional Www www = 5;
+  extensions 100 to 199;
+}
+
+extend OpReturn{
+   optional string foo = 101;
+}
