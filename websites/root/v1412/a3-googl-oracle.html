@@ -37,10 +37,10 @@
         <md-button class="md-raised" ng-click="genFoo()">Build <i class="fa fa-gears"></i>
         </md-button>
       </div>
-      <md-text-float label="size(OverlayOracle.Foo)" ng-model="foo.r.orsize"></md-text-float>
-      <md-text-float label="0x590c+hex(OverlayOracle.Foo)" ng-model="foo.r.orhex" class="long"></md-text-float>
-      <md-text-float label="0x590c+base64(OverlayOracle.Foo)" ng-model="foo.r.orbase64" class="long"></md-text-float>
-      <md-text-float label="RIPEMD160(SHA2_256(OverlayOracle.Foo)) hex" ng-model="foo.r.orhash160" class="long"></md-text-float>
+      <md-text-float label="size(0x590c+OverlayOracle.Foo)" ng-model="foo.r.orsize"></md-text-float>
+      <md-text-float label="hex(0x590c+OverlayOracle.Foo)" ng-model="foo.r.orhex" class="long"></md-text-float>
+      <md-text-float label="base64(0x590c+OverlayOracle.Foo)" ng-model="foo.r.orbase64" class="long"></md-text-float>
+      <md-text-float label="RIPEMD160(SHA2_256(0x590c+OverlayOracle.Foo)) hex" ng-model="foo.r.orhash160" class="long"></md-text-float>
       <md-text-float label="goo.gl target url" ng-model="foo.r.googl" class="long"></md-text-float>
     </md-card>
     <md-card>
@@ -82,7 +82,7 @@
     <md-card>
       <div layout="row">
         <div class="rowhead">
-          <md-button class="md-fab md-primary" aria-label="index">5</md-button>
+          <md-button class="md-fab md-primary" aria-label="index">4</md-button>
         </div>
         <div>
           <h2>Parse(OpReturn.FileProofUrl) from blockchain/tx</h2>
@@ -99,8 +99,8 @@
           <md-text-float label="FileProofUrl extType" ng-model="fr.extType"></md-text-float>
           <md-text-float label="FileProofUrl urlId" ng-model="fr.urlId"></md-text-float>
         </div>
-        <md-text-float label="RIPEMD160(SHA2_256(v))" ng-model="fr.hash160" class="long"></md-text-float>
         <md-text-float label="Target url" ng-model="fr.url" class="long"></md-text-float>
+        <md-text-float label="RIPEMD160(SHA2_256(v))" ng-model="fr.hash160" class="long"></md-text-float>
         <div class="row">
           <span flex></span>
           <md-button class="md-raised md-primary" ng-click="parseOpReturnTx()">Get/Parse <i class="fa fa-external-link fa-rotate-180"></i>
@@ -115,7 +115,7 @@
     <md-card>
       <div layout="row">
         <div class="rowhead">
-          <md-button class="md-fab md-primary" aria-label="index">6</md-button>
+          <md-button class="md-fab md-primary" aria-label="index">5</md-button>
         </div>
         <div>
           <h2>Parse(OverlayOracle.Foo)</h2>
@@ -130,6 +130,7 @@
       <md-text-float label="OverlayOracle.foo size" ng-model="googlexp.oracleSize"></md-text-float>
       <md-text-float label="OverlayOracle.foo.tagString" ng-model="googlexp.oracle.foo.tagString" class="long"></md-text-float>
       <md-text-float label="OverlayOracle.foo.tagInt32" ng-model="googlexp.oracle.foo.tagInt32"></md-text-float>
+      <md-text-float label="RIPEMD160(SHA2_256(0x590c+OverlayOracle.foo)" ng-model="googlexp.hash160" class="long"></md-text-float>
     </md-card>
   </div>
   <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.8/angular.min.js"></script>
@@ -154,7 +155,7 @@
 
         var reshbTx = $resource('https://mainnet.helloblock.io/v1/transactions/:tx');
 
-        $scope.findtx = '9c5a4af02a20aa8cbe4fdc45c574b990d55c297d08a697ee2b0589af78b8fc25';
+        $scope.findtx = 'eda4396590bef9b0e6b2cf66ddd8f5db75b5435b1a6e178f2c39f1d279f1e6b1';
         $scope.foo = {
           'tagString': 'Hello Bitcoin With Cryptography We Trust! TAICHUNG',
           'tagInt32': 123
@@ -165,13 +166,6 @@
         $scope.fr = {};
         $scope.v = {};
         $scope.ext = {};
-
-        $scope.v.hash256 = '08D4CCF4F1269AD55F4F10672A6D53E2D7933D4444549CF341629AEAD9C7D368';
-        $scope.v.eidString = '590c.proto';
-        $scope.v.fileSize = 2452;
-        // http://pastebin.com/6gBKQShs
-        // http://goo.gl/QJMZ4u
-        $scope.v.eidInt32 = null;
 
         var frInit = function() {
           $scope.fr.content = 'NODATA';
@@ -211,10 +205,12 @@
 
             Googl.get(null, function(v) {
                 var r = {};
-                r.base64 = v.longUrl.replace(GOOGL_PREFIX+'590c','');
-                r.oracle = Y590c.ParseOracle(r.base64);
+                r.base64 = v.longUrl.replace(GOOGL_PREFIX,'');
                 r.longUrl = v.longUrl;
-                r.oracleSize = r.oracle.calculate();
+                var pr = Y590c.ParseOracle(r.base64);
+                r.oracle = pr.oracle;
+                r.oracleSize = pr.oracleSize;
+                r.hash160 = pr.hash160;
                 $scope.googlexp = r;
                 console.log(r);
             });
