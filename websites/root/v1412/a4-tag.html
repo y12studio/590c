@@ -44,12 +44,47 @@
         </div>
         <md-text-float label="OP_RETURN hex({{pbr.result.size}} bytes)" ng-model="pbr.result.hex" class="long"></md-text-float>
       </form>
-
+    </md-card>
+    <md-card>
+        <div layout="row">
+            <div class="rowhead">
+                <md-button class="md-fab md-primary" aria-label="index">2</md-button>
+            </div>
+            <div>
+                <h2>Build(OpReturn.FileProof)</h2>
+            </div>
+        </div>
+        <h4>Target file : <a href="http://590c.org/img/logo-v1412.png" target="_blank">http://590c.org/img/logo-v1412.png</a></h4>
+        <div layout="row">
+            <span flex></span>
+            <md-button class="md-raised md-primary" ng-click="ypp.ExtGo('http://onlinemd5.com/')">onlinemd5 <i class="fa fa-external-link"></i>
+            </md-button>
+            <md-button class="md-raised" ng-click="ypp.ExtGo('https://md5file.com/calculator')">md5file <i class="fa fa-external-link"></i>
+            </md-button>
+            <md-button class="md-raised md-warn" ng-click="ypp.ExtGo('http://www.fileformat.info/tool/hash.htm')">Fileformat <i class="fa fa-external-link"></i>
+            </md-button>
+            <md-button class="md-raised" ng-click="ypp.ExtGo('https://defuse.ca/checksums.htm')">Defuse <i class="fa fa-external-link"></i>
+            </md-button>
+        </div>
+        <form>
+            <md-text-float label="File SHA2-256 Hex String" ng-model="fp.sha256" class="long"></md-text-float>
+            <div class="row">
+                <md-text-float label="File Size Bytes" type="number" ng-model="fp.fileSize"></md-text-float>
+                <md-text-float label="Tag String" ng-model="fp.tagString"></md-text-float>
+                <md-text-float label="Tag Integer" type="number" ng-model="fp.tagInt32"></md-text-float>
+                <span flex></span>
+                <md-button class="md-raised" ng-click="genFileProof()">Build <i class="fa fa-gears"></i>
+                </md-button>
+            </div>
+            <md-text-float label="RIPEMD160(SHA2_256(file))" ng-model="fpr.fileHash160" class="long"></md-text-float>
+            <md-text-float label="RIPEMD160(SHA2_256(file)) Split" ng-model="fpr.fileHash160Split" class="long"></md-text-float>
+            <md-text-float label="OP_RETURN hex ({{fpr.result.size}} bytes)" ng-model="fpr.result.hex" class="long"></md-text-float>
+        </form>
     </md-card>
     <md-card>
       <div layout="row">
         <div class="rowhead">
-          <md-button class="md-fab md-primary" aria-label="index">2</md-button>
+          <md-button class="md-fab md-primary" aria-label="index">x</md-button>
         </div>
         <div>
           <h2>Parse(OpReturn.Tag) From The Blockchain</h2>
@@ -97,12 +132,18 @@
         $scope.ypp = Ypp;
 
         $scope.findtx = '6f5a3ebba2a341b8babbc174f3a3432faf27e42d63d4e60a616d80a293c0a562';
+        $scope.fileProofTx = 'ca3cb501aca014c96a12cf6d581d4dd69bea0f875d0e49d754b0e3de987a5800';
         $scope.fr = {};
         $scope.v = {};
 
         $scope.v.tagString = 'TW-v1412-alpha4@590c.org';
         $scope.v.tagInt32 = 1059;
         $scope.v.tagBytes = 'efcd';
+
+        $scope.fp = {};
+        $scope.fp.sha256 = '99a7d0788ebf2cf4d7a1560a9306558065e4cf1cc98759ec5219354bd09d0b92';
+        $scope.fp.tagString = '590c.org';
+        $scope.fp.fileSize = 27036;
 
         var frInit = function() {
           $scope.fr.content = 'NODATA';
@@ -114,6 +155,13 @@
           var v = $scope.v;
           $scope.pbr = Y590c.createTag(v.tagString, v.tagInt32, v.tagBytes);
           console.log($scope.pbr);
+        };
+
+        $scope.genFileProof = function() {
+            var fp = $scope.fp;
+            // Y590c.createFileProof = function(sha256Hex, fileSize, tagString, tagInt32) {
+            $scope.fpr = Y590c.createFileProof(fp.sha256, fp.fileSize, fp.tagString , fp.tagInt32 );
+            console.log($scope.fpr);
         };
 
         $scope.parseOpReturnTx = function() {

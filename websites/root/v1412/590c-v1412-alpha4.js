@@ -94,25 +94,41 @@ Y590c.toHash160AndSha256 = function(targetHex) {
   return bf.toString('hex');
 }
 
-Y590c.createFileProof = function(hashType, hash160Sha256Hex, fileSize, tagString, tagInt32) {
-  var r = new Y590c.OpReturn(Y590c.OpReturn.Type.FILE_PROOF);
-  console.log('RIPEMD160(SHA2_256(v))=' + hash160Sha256Hex);
-  var dBufHash = dcodeIO.ByteBuffer.fromHex(hash160Sha256Hex);
-  var fr = new Y590c.OpReturn.FileProof(hashType, dBufHash, fileSize);
-
-  if (tagString) {
-    fr.tagString = tagString;
+Y590c.createFileProof = function(sha256Hex, fileSize, tagString, tagInt32) {
+  var pbr = {};
+  var hash160Sha256Hex = Y590c.toHash160WithSha256(sha256Hex);
+  var r = Y590c.createFileProofHash160Pb(hash160Sha256Hex, fileSize, tagString, tagInt32);
+  console.log(r.calculate());
+  // 38+2 = 40 bytes
+  var diff = r.calculate() - 38;
+  if(diff>0){
+      // split hash160
+      var hash160HexSplit = hash160Sha256Hex.slice(0, (-2 * diff));
+      r = Y590c.createFileProofHash160Pb(hash160HexSplit, fileSize, tagString, tagInt32);
+      pbr.fileHash160Split = hash160HexSplit;
   }
-  if (tagInt32) {
-    fr.tagInt32 = tagInt32;
-  }
-
-  r.fileProof = fr;
-  r.hash160Hex = hash160Sha256Hex;
-  Y590c.PbPost(r);
-  Y590c.PbPrint(r);
-  return r;
+  pbr.fileHash160 = hash160Sha256Hex;
+  pbr.pb = r;
+  pbr.result = Y590c.PbPost(r);
+  return pbr;
 }
+
+Y590c.createFileProofHash160Pb = function(hash160Sha256Hex, fileSize, tagString, tagInt32) {
+    var r = new Y590c.OpReturn(Y590c.OpReturn.Type.FILE_PROOF);
+    var hashType = Y590c.OpReturn.HashType.SHA2_256_RIPEMD_160;
+    var dBufHash = dcodeIO.ByteBuffer.fromHex(hash160Sha256Hex);
+    var fr = new Y590c.OpReturn.FileProof(hashType, dBufHash, fileSize);
+
+    if (tagString) {
+        fr.tagString = tagString;
+    }
+    if (tagInt32) {
+        fr.tagInt32 = tagInt32;
+    }
+    r.fileProof = fr;
+    return r;
+}
+
 
 Y590c.createFileProofUrlGoogl = function(hashType, hash160Hex, fileSize, googlId) {
   var r = new Y590c.OpReturn(Y590c.OpReturn.Type.FILE_PROOF_URL);
