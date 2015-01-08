@@ -13,6 +13,9 @@
         max-width: 864px;
         margin: auto;
     }
+    md-input-group.long > input {
+        width: 566px;
+    }
     </style>
 </head>
 
@@ -21,6 +24,20 @@
     <div class="doc-content" ng-controller="YourController">
         <md-card>
             <h2>BIP32 HD Master Key</h2>
+            <div>
+            <h2>m</h2>
+                <md-text-float label="Master PrivKey(Base58)" ng-model="hd.base58Priv" class="long"></md-text-float>
+                <md-text-float label="Master PrivKey(WIF)" ng-model="hd.wif" class="long"></md-text-float>
+                <md-text-float label="Master Bitcoin Address" ng-model="hd.addr" class="long"></md-text-float>
+                <md-text-float label="Master PublicKey(Base58)" ng-model="hd.base58Pub" class="long"></md-text-float>
+            </div>
+            <div ng-repeat="node in childs">
+            <h2>m/{{node.index}}h</h2>
+                <md-text-float label="PrivKey(Base58)" ng-model="node.base58Priv" class="long"></md-text-float>
+                <md-text-float label="PrivKey(WIF)" ng-model="node.wif" class="long"></md-text-float>
+                <md-text-float label="Bitcoin Address" ng-model="node.addr" class="long"></md-text-float>
+                <md-text-float label="PublicKey(Base58)" ng-model="node.base58Pub" class="long"></md-text-float>
+            </div>
         </md-card>
         <md-card>
             <div layout="row">
@@ -45,13 +62,31 @@
     angular.module('YourApp', ['ngMaterial'])
     .controller("YourController", ['$scope', function($scope) {
         $scope.foo = 'hello'
+
+        var wrapNode = function(hn) {
+            var r = {}
+            r.base58Priv = hn.toBase58()
+            r.wif = hn.privKey.toWIF()
+            r.addr = hn.getAddress()
+            r.base58Pub = hn.neutered().toBase58()
+            r.hn = hn
+            console.log(r)
+            return r
+        }
+
         var random = new Random(Random.engines.browserCrypto)
-        console.log(random)
         var seedHex = random.hex(64)
         console.log(seedHex)
-        console.log(random.hex(64))
         var hd = bitcoin.HDNode.fromSeedHex(seedHex)
-        console.log(hd)
+        $scope.hd = wrapNode(hd)
+        var childs = []
+        for (i = 0; i < 3; i++) {
+            var child = hd.deriveHardened(i)
+            var r = wrapNode(child)
+            r.index = i
+            childs.push(r);
+        }
+        $scope.childs = childs
     }]);
 </script>
 </body>
