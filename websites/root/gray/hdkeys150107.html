@@ -9,13 +9,28 @@
     <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/angular_material/0.6.1/angular-material.min.css">
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
     <style>
-    .doc-content {
-        max-width: 864px;
-        margin: auto;
-    }
-    md-input-group.long > input {
-        width: 566px;
-    }
+        .doc-content {
+            max-width: 864px;
+            margin: auto;
+        }
+        md-input-group.long > input {
+            width: 666px;
+        }
+        .address {
+            background-color: #CBCBCB;
+            padding: 0.3em;
+            margin: 0.3em;
+        }
+        .chain {
+            background-color: #DBDBDB;
+            padding: 0.8em;
+            margin: 0.5em;
+        }
+        .account {
+            background-color: #EBEBEB;
+            padding: 1em;
+            margin: 1em;
+        }
     </style>
 </head>
 
@@ -25,18 +40,46 @@
         <md-card>
             <h2>BIP32 HD Master Key</h2>
             <div>
-            <h2>m</h2>
+                <h2>m node</h2>
                 <md-text-float label="Master PrivKey(Base58)" ng-model="hd.base58Priv" class="long"></md-text-float>
                 <md-text-float label="Master PrivKey(WIF)" ng-model="hd.wif" class="long"></md-text-float>
                 <md-text-float label="Master Bitcoin Address" ng-model="hd.addr" class="long"></md-text-float>
                 <md-text-float label="Master PublicKey(Base58)" ng-model="hd.base58Pub" class="long"></md-text-float>
             </div>
-            <div ng-repeat="node in childs">
-            <h2>m/{{node.index}}h</h2>
-                <md-text-float label="PrivKey(Base58)" ng-model="node.base58Priv" class="long"></md-text-float>
-                <md-text-float label="PrivKey(WIF)" ng-model="node.wif" class="long"></md-text-float>
-                <md-text-float label="Bitcoin Address" ng-model="node.addr" class="long"></md-text-float>
-                <md-text-float label="PublicKey(Base58)" ng-model="node.base58Pub" class="long"></md-text-float>
+            <div class="account" ng-repeat="account in accounts">
+                <h2>m/{{account.index}}h account</h2>
+                <md-text-float label="PrivKey(Base58)" ng-model="account.base58Priv" class="long"></md-text-float>
+                <md-text-float label="PrivKey(WIF)" ng-model="account.wif" class="long"></md-text-float>
+                <md-text-float label="Bitcoin Address" ng-model="account.addr" class="long"></md-text-float>
+                <md-text-float label="PublicKey(Base58)" ng-model="account.base58Pub" class="long"></md-text-float>
+                <div class="chain">
+
+                    <h3>m/{{account.index}}h/0 external chain</h3>
+                    <md-text-float label="PrivKey(Base58)" ng-model="account.chExternal.base58Priv" class="long"></md-text-float>
+                    <md-text-float label="PrivKey(WIF)" ng-model="account.chExternal.wif" class="long"></md-text-float>
+                    <md-text-float label="Bitcoin Address" ng-model="account.chExternal.addr" class="long"></md-text-float>
+                    <md-text-float label="PublicKey(Base58)" ng-model="account.chExternal.base58Pub" class="long"></md-text-float>
+
+                    <div class="address" ng-repeat="address in account.chExternal.addresses">
+                        <h3>m/{{account.index}}h/0/{{address.index}} external address</h3>
+                        <md-text-float label="PrivKey(WIF)" ng-model="address.wif" class="long"></md-text-float>
+                        <md-text-float label="Bitcoin Address" ng-model="address.addr" class="long"></md-text-float>
+                    </div>
+                </div>
+
+                <div class="chain">
+                    <h3>m/{{account.index}}h/1 internal chain</h3>
+                    <md-text-float label="PrivKey(Base58)" ng-model="account.chInternal.base58Priv" class="long"></md-text-float>
+                    <md-text-float label="PrivKey(WIF)" ng-model="account.chInternal.wif" class="long"></md-text-float>
+                    <md-text-float label="Bitcoin Address" ng-model="account.chInternal.addr" class="long"></md-text-float>
+                    <md-text-float label="PublicKey(Base58)" ng-model="account.chInternal.base58Pub" class="long"></md-text-float>
+                    <div class="address" ng-repeat="address in account.chInternal.addresses">
+                        <h3>m/{{account.index}}h/1/{{address.index}} internal address</h3>
+                        <md-text-float label="PrivKey(WIF)" ng-model="address.wif" class="long"></md-text-float>
+                        <md-text-float label="Bitcoin Address" ng-model="address.addr" class="long"></md-text-float>
+                    </div>
+                </div>
+
             </div>
         </md-card>
         <md-card>
@@ -58,37 +101,50 @@
     <script src="/js/randomjs/1.0.4/random.min.js"></script>
     <script src="/js/bitcoinjs/1.4.2/bitcoinjs.min.js"></script>
     <script>
-    // Include app dependency on ngMaterial
-    angular.module('YourApp', ['ngMaterial'])
-    .controller("YourController", ['$scope', function($scope) {
-        $scope.foo = 'hello'
+        // Include app dependency on ngMaterial
+        angular.module('YourApp', ['ngMaterial'])
+            .controller("YourController", ['$scope', function($scope) {
+                $scope.foo = 'hello'
 
-        var wrapNode = function(hn) {
-            var r = {}
-            r.base58Priv = hn.toBase58()
-            r.wif = hn.privKey.toWIF()
-            r.addr = hn.getAddress()
-            r.base58Pub = hn.neutered().toBase58()
-            r.hn = hn
-            console.log(r)
-            return r
-        }
+                var wrapNode = function(hn) {
+                    var r = {}
+                    r.base58Priv = hn.toBase58()
+                    r.wif = hn.privKey.toWIF()
+                    r.addr = hn.getAddress()
+                    r.base58Pub = hn.neutered().toBase58()
+                    r.hn = hn
+                    console.log(r)
+                    return r
+                }
 
-        var random = new Random(Random.engines.browserCrypto)
-        var seedHex = random.hex(64)
-        console.log(seedHex)
-        var hd = bitcoin.HDNode.fromSeedHex(seedHex)
-        $scope.hd = wrapNode(hd)
-        var childs = []
-        for (i = 0; i < 3; i++) {
-            var child = hd.deriveHardened(i)
-            var r = wrapNode(child)
-            r.index = i
-            childs.push(r);
-        }
-        $scope.childs = childs
-    }]);
-</script>
+                var random = new Random(Random.engines.browserCrypto)
+                var seedHex = random.hex(64)
+                console.log(seedHex)
+                var hd = bitcoin.HDNode.fromSeedHex(seedHex)
+                $scope.hd = wrapNode(hd)
+                var accounts = []
+                for (i = 0; i < 2; i++) {
+                    var r = wrapNode(hd.deriveHardened(i))
+                    r.index = i
+                    r.chExternal = wrapNode(r.hn.derive(0))
+                    r.chInternal = wrapNode(r.hn.derive(1))
+                    r.chExternal.addresses = []
+                    r.chInternal.addresses = []
+                    for (j = 0; j < 3; j++) {
+                        console.log(j)
+                        var extAddr = wrapNode(r.chExternal.hn.derive(j))
+                        extAddr.index = j
+                        r.chExternal.addresses.push(extAddr)
+                        var intAddr = wrapNode(r.chInternal.hn.derive(j))
+                        intAddr.index = j
+                        r.chInternal.addresses.push(intAddr)
+                    }
+
+                    accounts.push(r);
+                }
+                $scope.accounts = accounts
+            }]);
+    </script>
 </body>
 
 </html>
