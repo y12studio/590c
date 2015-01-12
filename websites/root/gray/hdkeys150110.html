@@ -13,6 +13,11 @@
             max-width: 864px;
             margin: auto;
         }
+
+        md-card {
+            padding:1em;
+        }
+
         md-input-group.long > input {
             width: 666px;
         }
@@ -46,7 +51,7 @@
 
     <div class="doc-content" ng-controller="YourController">
         <md-card>
-            <h2>BIP32 HD Master Key</h2>
+            <h2>BIP32 HD Master Node And Account</h2>
             <md-text-float label="Seed(now {{seed.length}}/max 64 bytes)" ng-model="seed" class="long"></md-text-float>
             <div layout="row" layout-align="center">
                 <md-button class="md-raised md-warn" ng-click="randomSeed()">Random Seed <i class="fa fa-btc"></i>
@@ -63,8 +68,7 @@
             </div>
             <div layout="row" layout-align="center">
                 <md-text-float label="Account Number" ng-model="accountNum" type="number"></md-text-float>
-                <md-text-float label="Address Number" ng-model="addressNum" type="number"></md-text-float>
-                <md-button class="md-raised md-warn" ng-click="buildAccount()">Get Address <i class="fa fa-btc"></i>
+                <md-button class="md-raised md-warn" ng-click="buildAccount()">Get Account <i class="fa fa-btc"></i>
                 </md-button>
             </div>
             <div class="account">
@@ -73,131 +77,149 @@
                 <md-text-float label="Public(Base58)" ng-model="account.base58Pub" class="long"></md-text-float>
                 <md-text-float label="PrivKey(WIF)" ng-model="account.wif" class="long"></md-text-float>
                 <md-text-float label="Bitcoin Address" ng-model="account.addr" class="long"></md-text-float>
+
+            </div>
+            <h4>Json Format</h4>
+            <textarea rows="20" cols="80" ng-click="onTextClick($event)">{{jsonOutput}}</textarea>
+        </md-card>
+        <div class="doc-content" ng-controller="YourController">
+            <md-card>
+                <h2>BIP32 HD Account and Address</h2>
+                <md-text-float label="m/ih account i private extended key(base58)" ng-model="a2xprv" class="long"></md-text-float>
+                <div layout="row" layout-align="center">
+                    <md-text-float label="Address Number" ng-model="addressNum" type="number"></md-text-float>
+                    <md-button class="md-raised md-warn" ng-click="buildAddress()">Get Address <i class="fa fa-btc"></i>
+                    </md-button>
+                </div>
                 <div class="chain">
-
-                    <h3>m/{{accountNum}}h/0 external chain</h3>
-                    <md-text-float label="Priv(Base58)" ng-model="account.chExternal.base58Priv" class="long"></md-text-float>
-                    <md-text-float label="Public(Base58)" ng-model="account.chExternal.base58Pub" class="long"></md-text-float>
-                    <md-text-float label="PrivKey(WIF)" ng-model="account.chExternal.wif" class="long"></md-text-float>
-                    <md-text-float label="Bitcoin Address" ng-model="account.chExternal.addr" class="long"></md-text-float>
-
+                    <h3>m/ih/0 external chain</h3>
+                    <md-text-float label="Priv(Base58)" ng-model="a2.chExternal.base58Priv" class="long"></md-text-float>
+                    <md-text-float label="Public(Base58)" ng-model="a2.chExternal.base58Pub" class="long"></md-text-float>
                     <div class="address">
-                        <h3>m/{{accountNum}}h/0/{{addressNum}} external address</h3>
-                        <md-text-float label="PrivKey(WIF)" ng-model="account.chExternal.address.wif" class="long"></md-text-float>
-                        <md-text-float label="Bitcoin Address" ng-model="account.chExternal.address.addr" class="long"></md-text-float>
+                        <h3>m/ih/0/{{addressNum}} external address</h3>
+                        <md-text-float label="PrivKey(WIF)" ng-model="a2.chExternal.address.wif" class="long"></md-text-float>
+                        <md-text-float label="Bitcoin Address" ng-model="a2.chExternal.address.addr" class="long"></md-text-float>
                     </div>
                 </div>
 
                 <div class="chain">
-                    <h3>m/{{accountNum}}h/1 internal chain</h3>
-                    <md-text-float label="Priv(Base58)" ng-model="account.chInternal.base58Priv" class="long"></md-text-float>
-                    <md-text-float label="Public(Base58)" ng-model="account.chInternal.base58Pub" class="long"></md-text-float>
-                    <md-text-float label="PrivKey(WIF)" ng-model="account.chInternal.wif" class="long"></md-text-float>
-                    <md-text-float label="Bitcoin Address" ng-model="account.chInternal.addr" class="long"></md-text-float>
+                    <h3>m/ih/1 internal chain</h3>
+                    <md-text-float label="Priv(Base58)" ng-model="a2.chInternal.base58Priv" class="long"></md-text-float>
+                    <md-text-float label="Public(Base58)" ng-model="a2.chInternal.base58Pub" class="long"></md-text-float>
                     <div class="address">
-                        <h3>m/{{accountNum}}h/1/{{addressNum}} internal address</h3>
-                        <md-text-float label="PrivKey(WIF)" ng-model="account.chInternal.address.wif" class="long"></md-text-float>
-                        <md-text-float label="Bitcoin Address" ng-model="account.chInternal.address.addr" class="long"></md-text-float>
+                        <h3>m/ih/1/{{addressNum}} internal address</h3>
+                        <md-text-float label="PrivKey(WIF)" ng-model="a2.chInternal.address.wif" class="long"></md-text-float>
+                        <md-text-float label="Bitcoin Address" ng-model="a2.chInternal.address.addr" class="long"></md-text-float>
                     </div>
                 </div>
-            </div>
-        </md-card>
-        <md-card>
-        <h4>Json Format</h4>
-        <textarea rows="20" cols="80">{{jsonOutput}}</textarea>
-    </md-card>
-        <md-card>
-            <div layout="row">
-                <span flex></span>
-                <p>© 590c.org 2014 | All Rights Reserved <i class="fa fa-btc"></i>
-                </p>
-            </div>
-        </md-card>
-    </div>
-    <!-- Angular Material Dependencies -->
-    <script src="//cdn.jsdelivr.net/hammerjs/2.0.4/hammer.min.js"></script>
-    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.8/angular.min.js"></script>
-    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.8/angular-animate.min.js"></script>
-    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.8/angular-aria.min.js"></script>
+                <h4>Json Format</h4>
+                <textarea rows="20" cols="80" ng-click="onTextClick($event)">{{jsonA2Output}}</textarea>
+            </md-card>
+            <md-card>
+                <div layout="row">
+                    <span flex></span>
+                    <p>© 590c.org 2014 | All Rights Reserved <i class="fa fa-btc"></i>
+                    </p>
+                </div>
+            </md-card>
+        </div>
+        <!-- Angular Material Dependencies -->
+        <script src="//cdn.jsdelivr.net/hammerjs/2.0.4/hammer.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.8/angular.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.8/angular-animate.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.8/angular-aria.min.js"></script>
 
-    <!-- Angular Material Javascript now available via Google CDN; version 0.6 used here -->
-    <script src="//ajax.googleapis.com/ajax/libs/angular_material/0.6.1/angular-material.min.js"></script>
-    <script src="/js/randomjs/1.0.4/random.min.js"></script>
-    <script src="/js/bitcoinjs/1.4.3/bitcoinjs.min.js"></script>
-    <script src="/js/dcodeIO/ByteBuffer/3.5.4/ByteBufferAB.min.js"></script>
-    <script>
-        // Include app dependency on ngMaterial
-        angular.module('YourApp', ['ngMaterial'])
-            .controller("YourController", ['$scope', function($scope) {
-                $scope.foo = 'hello'
+        <!-- Angular Material Javascript now available via Google CDN; version 0.6 used here -->
+        <script src="//ajax.googleapis.com/ajax/libs/angular_material/0.6.1/angular-material.min.js"></script>
+        <script src="/js/randomjs/1.0.4/random.min.js"></script>
+        <script src="/js/bitcoinjs/1.4.3/bitcoinjs.min.js"></script>
+        <script src="/js/dcodeIO/ByteBuffer/3.5.4/ByteBufferAB.min.js"></script>
+        <script>
+            // Include app dependency on ngMaterial
+            angular.module('YourApp', ['ngMaterial'])
+                .controller("YourController", ['$scope', function($scope) {
+                    $scope.foo = 'hello'
 
-                $scope.seed = '000102030405060708090a0b0c0d0e0f'
-                $scope.accountNum = 0
-                $scope.addressNum = 0
-                var jr = {}
+                    $scope.seed = '000102030405060708090a0b0c0d0e0f'
+                    $scope.accountNum = 0
+                    $scope.addressNum = 0
+                    var jr = {}
+                    $scope.a2xprv = 'xprv9v64Frbn7nJGv1xpLsc3M1SAaJ88bNbf28va7BgL1XR34BWx5Tm7V2ns3LSoxFHGA24a9XGCkXHUDJnE2WdyJRaGStH8ZmT8diLAN6Ccgzs'
 
-                $scope.randomSeed = function() {
-                    var random = new Random(Random.engines.browserCrypto)
-                    $scope.seed = random.hex(64)
-                }
-
-                $scope.buildMaster = function() {
-                    var seedHex = $scope.seed
-                    try {
-                        var buf = dcodeIO.ByteBuffer.fromHex($scope.seed)
-                    } catch (err) {
-                        seedHex = toHash256($scope.seed)
+                    $scope.randomSeed = function() {
+                        var random = new Random(Random.engines.browserCrypto)
+                        $scope.seed = random.hex(64)
                     }
-                    $scope.mhd = bitcoin.HDNode.fromSeedHex(seedHex)
-                    $scope.m = wrapNode($scope.mhd, 'm')
-                    jr.m = $scope.m
-                }
 
-                $scope.buildAccount = function() {
-                    var accountNo = $scope.accountNum
-                    var addressNo = $scope.addressNum
+                    $scope.buildMaster = function() {
+                        var seedHex = $scope.seed
+                        try {
+                            var buf = dcodeIO.ByteBuffer.fromHex($scope.seed)
+                        } catch (err) {
+                            seedHex = toHash256($scope.seed)
+                        }
+                        $scope.mhd = bitcoin.HDNode.fromSeedHex(seedHex)
+                        $scope.m = wrapNode($scope.mhd, 'm')
+                        $scope.m.seed = $scope.seed
+                        jr.m = $scope.m
+                    }
 
-                    $scope.acchd = $scope.mhd.deriveHardened(accountNo)
-                    $scope.exthd = $scope.acchd.derive(0)
-                    $scope.inthd = $scope.acchd.derive(1)
+                    $scope.buildAccount = function() {
+                        var accountNo = $scope.accountNum
+                        $scope.acchd = $scope.mhd.deriveHardened(accountNo)
+                        var r = wrapNode($scope.acchd, 'm/' + accountNo + 'h')
+                        $scope.account = r
+                        jr.account = $scope.account
 
-                    $scope.extAddrHd = $scope.exthd.derive(addressNo)
-                    $scope.intAddrHd = $scope.inthd.derive(addressNo)
+                        $scope.jsonOutput = JSON.stringify(jr, null, 2)
+                    }
 
-                    var r = wrapNode($scope.acchd,'m/'+accountNo+'h')
-                    r.chExternal = wrapNode($scope.exthd,'m/'+accountNo+'h/0')
-                    r.chInternal = wrapNode($scope.inthd,'m/'+accountNo+'h/1')
-                    r.chExternal.address = wrapNode($scope.extAddrHd,'m/'+accountNo+'h/0/'+addressNo)
-                    r.chInternal.address = wrapNode($scope.intAddrHd,'m/'+accountNo+'h/1/'+addressNo)
-                    $scope.account = r
-                    jr.account = $scope.account
+                    $scope.buildAddress = function() {
+                        var a2hn = bitcoin.HDNode.fromBase58($scope.a2xprv)
+                        var exthd = a2hn.derive(0)
+                        var inthd = a2hn.derive(1)
 
-                    $scope.jsonOutput = JSON.stringify(jr,null,2)
+                        var addressNo = $scope.addressNum
 
-                }
+                        var extAddrHd = exthd.derive(addressNo)
+                        var intAddrHd = inthd.derive(addressNo)
 
-                var toHash256 = function(targetStr) {
-                    var targetHex = dcodeIO.ByteBuffer.fromUTF8(targetStr).toHex()
-                    // https://github.com/bitcoinjs/bitcoinjs-lib/blob/master/src/script.js
-                    var bjsBuffer = bitcoin.Script.fromHex(targetHex).toBuffer();
-                    // hash256 = sha256(sha256(buffer))
-                    return bitcoin.crypto.hash256(bjsBuffer).toString('hex');
-                }
+                        var r = wrapNode(a2hn, 'm/ih')
+                        r.chExternal = wrapNode(exthd, 'm/ih/0')
+                        r.chInternal = wrapNode(inthd, 'm/h/1')
+                        r.chExternal.address = wrapNode(extAddrHd, 'm/ih/0/' + addressNo)
+                        r.chInternal.address = wrapNode(intAddrHd, 'm/ih/1/' + addressNo)
+                        $scope.a2 = r
+                        $scope.jsonA2Output = JSON.stringify(r, null, 2)
+
+                    }
+
+                    $scope.onTextClick = function ($event) {
+                        $event.target.select();
+                    };
+
+                    var toHash256 = function(targetStr) {
+                        var targetHex = dcodeIO.ByteBuffer.fromUTF8(targetStr).toHex()
+                            // https://github.com/bitcoinjs/bitcoinjs-lib/blob/master/src/script.js
+                        var bjsBuffer = bitcoin.Script.fromHex(targetHex).toBuffer();
+                        // hash256 = sha256(sha256(buffer))
+                        return bitcoin.crypto.hash256(bjsBuffer).toString('hex');
+                    }
 
 
-                var wrapNode = function(hn,desc) {
-                    var r = {}
-                    r.desc = desc
-                    r.base58Priv = hn.toBase58()
-                    r.wif = hn.privKey.toWIF()
-                    r.addr = hn.getAddress().toString()
-                    r.base58Pub = hn.neutered().toBase58()
-                    //r.hn = hn
-                    console.log(r)
-                    return r
-                }
-            }]);
-    </script>
+                    var wrapNode = function(hn, desc) {
+                        var r = {}
+                        r.desc = desc
+                        r.base58Priv = hn.toBase58()
+                        r.wif = hn.privKey.toWIF()
+                        r.addr = hn.getAddress().toString()
+                        r.base58Pub = hn.neutered().toBase58()
+                            //r.hn = hn
+                        console.log(r)
+                        return r
+                    }
+                }]);
+        </script>
 </body>
 
 </html>
