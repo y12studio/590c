@@ -1,0 +1,31 @@
+{
+    "name": "blockwatcher",
+    "version": "0.0.1",
+    "author": "Y12STUDIO <y12studio@gmail.com>",
+    "description": "node.js module to watch the blockchain",
+    "contributors": [
+        {
+            "name": "Y12STUDIO",
+            "email": "y12studio@gmail.com"
+        }
+    ],
+    "main": "./main",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/y12studio/590c"
+    },
+    "keywords": [
+        "blockchain",
+        "bitcoin"
+    ],
+    "dependencies": {
+        "websocket": "1.0.x",
+        "underscore": "1.4.x",
+        "debug": "0.7.x"
+    },
+
+    "license": "MIT",
+    "engines": {
+        "node": ">=0.10"
+    }
+}
