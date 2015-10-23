@@ -78,6 +78,7 @@ var priceseqarr = []
 var passarr = []
 var bip38arr = []
 var svgbip38arr = []
+var imgptarr = []
     // generate bitcoin privatekey and address
 for (var i = 0; i < patterNum; i++) {
     var pk = new bitcore.PrivateKey()
@@ -99,7 +100,7 @@ for (var i = 0; i < patterNum; i++) {
     priceseq = format('BTCUSD{0}  USDTWD{1}  {2}', conf.pricebtcusd, conf.priceusdtwd, seqnum)
     y12seqarr.push(seq)
     priceseqarr.push(priceseq)
-    bip38pass = 'Y12 ' + math.randomInt(1000, 9999) + ' ' + math.randomInt(1000, 9990) + ' ' + math.randomInt(1000, 9999)
+    bip38pass = 'Y12 ' + math.randomInt(1000, 9999) + ' ' + math.randomInt(1000, 9999) + ' ' + math.randomInt(1000, 9999)
     passarr.push(bip38pass)
         // test-fast
     bip38str = bip38RealMode ? bip38encode(pk, addr, bip38pass) : '6PYNKZ1EAgYgmQfmNVamxyXVWHzK5s6DGhwP4J5o44cvXdoY7sRzhtpUeo'
@@ -108,6 +109,8 @@ for (var i = 0; i < patterNum; i++) {
         type: 'svg'
     })
     svgbip38arr.push(svgBip38)
+    // Pattern1-300px.png to 6
+    imgptarr.push(format('Pattern{0}-300px.png',math.randomInt(1,6)))
 }
 
 function bip38encode(key, addr, pass) {
@@ -157,6 +160,20 @@ function textArray(textarr, opt) {
     doc.restore()
 }
 
+function imgArray(imgarr, opt) {
+    doc.save()
+    doc.translate(opt.pgmx, opt.pgmy)
+    for (var i = 0; i < patterNum; i++) {
+        rx = opt.ran ? opt.rx + math.randomInt(0, opt.ranx) : opt.rx
+        ry = opt.ran ? opt.ry + math.randomInt(0, opt.rany) : opt.ry
+        row = Math.floor(i / 2)
+        tx = rx + ((i % 2 == 0) ? 0 : itemWidth)
+        ty = ry + itemHeight * row
+        doc.image(imgarr[i], tx, ty, {width: opt.imgwidth})
+    }
+    doc.restore()
+}
+
 function patternArray(ptsvg, opt) {
     doc.save()
     doc.translate(opt.pgmx, opt.pgmy)
@@ -175,6 +192,15 @@ function patternArray(ptsvg, opt) {
 function pageFront() {
     pgx = pgmarginx
     pgy = pgmarginy
+
+    imgArray(imgptarr, {
+        pgmx: pgx,
+        pgmy: pgy,
+        rx: 140,
+        ry: 45,
+        imgwidth:100
+    })
+
     patternArray(svgFront, {
             pgmx: pgx,
             pgmy: pgy
@@ -208,6 +234,9 @@ function pageFront() {
         rx: 280,
         ry: 160
     })
+
+
+
 }
 
 function lsArrMv(arr) {
