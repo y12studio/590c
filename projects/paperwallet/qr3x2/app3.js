@@ -4,6 +4,8 @@ var bip38 = new Bip38()
 var math = require('mathjs');
 var request = require('request');
 var format = require('string-format');
+// Moment.js http://momentjs.com/docs/#/displaying/
+var moment = require('moment');
 // devongovett/pdfkit https://github.com/devongovett/pdfkit
 PDFDocument = require('pdfkit')
 fs = require('fs')
@@ -17,11 +19,20 @@ var qr = require('qr-image');
 // pixl-xml  https://www.npmjs.com/package/pixl-xml
 var XML = require('pixl-xml');
 
-var svgFront = XML.parse('qr32f3.min.svg');
-var svgBack = XML.parse('qr32b3.min.svg');
+var conf = {
+    svgfront: 'qr32f5.min.svg',
+    svgback: 'qr32b5.min.svg',
+    pdf: 'qr32-5.pdf',
+    pricebtcusd: 279,
+    priceusdtwd: 32.34
+}
 
-// path[0] { d: 'M.965 1.23h97.83v77.443H.964z', fill: '#f9f9f9' }
-// console.log(baseSvg.path);
+var svgFront = XML.parse(conf.svgfront);
+var svgBack = XML.parse(conf.svgback);
+var qrcolorarr = ['#240B3B', '#173B0B', '#3B0B0B', '#0A2229', '#3B0B17', '#1C1C1C']
+var passcolorarr = ['#B40404', '#298A08', '#0B614B', '#08298A', '#380B61', '#8A0868', '#2E2E2E', '#B40431', '#8000FF']
+    // path[0] { d: 'M.965 1.23h97.83v77.443H.964z', fill: '#f9f9f9' }
+    // console.log(baseSvg.path);
 
 // https://github.com/devongovett/pdfkit/blob/master/lib/page.coffee#L72-L122
 // A4 px: [595.28, 841.89]
@@ -48,7 +59,7 @@ doc = new PDFDocument({
 
 //console.log(doc)
 // Pipe it's output somewhere
-doc.pipe(fs.createWriteStream('qr32-3.pdf'))
+doc.pipe(fs.createWriteStream(conf.pdf))
 
 // 3x2 A4
 // 594/3 = 198 - 4 = 194
@@ -56,8 +67,8 @@ doc.pipe(fs.createWriteStream('qr32-3.pdf'))
 var itemWidth = 416
 var itemHeight = 194
 var patterNum = 6
-var marginx = 5
-var marginy = 6
+var pgmarginx = 5
+var pgmarginy = 6
     // svg 200x80 px
 var pkarr = []
 var addrarr = []
@@ -83,8 +94,9 @@ for (var i = 0; i < patterNum; i++) {
     svgaddrarr.push(svg)
         //console.log(svg)
         // BTCUSD/BTCTWD/USDTWD
-    seq = 'Y12TW-2015-1022-' + (10001 + i)
-    priceseq = 'BTCUSD268-USDTWD32.47-' + (10001 + i)
+    seqnum = 10001 + i
+    seq = format('{0}-Y12TW {1}', moment().format('YYYYMMDDHH'), seqnum)
+    priceseq = format('BTCUSD{0}  USDTWD{1}  {2}', conf.pricebtcusd, conf.priceusdtwd, seqnum)
     y12seqarr.push(seq)
     priceseqarr.push(priceseq)
     bip38pass = 'Y12 ' + math.randomInt(1000, 9999) + ' ' + math.randomInt(1000, 9990) + ' ' + math.randomInt(1000, 9999)
@@ -106,15 +118,17 @@ function bip38encode(key, addr, pass) {
 
 function qrSvgArray(svgarr, opt) {
     doc.save()
-    doc.translate(marginx, marginy)
+    doc.translate(opt.pgmx, opt.pgmy)
     doc.translate(opt.rx, opt.ry)
+
     for (var i = 0; i < patterNum; i++) {
+        color = opt.rancolor ? math.pickRandom(opt.colorarr) : '#424242'
         tx = ((i % 2 == 0) ? itemWidth : itemWidth * -1)
         ty = ((i % 2 == 0) ? 0 : itemHeight)
         var svgQr = svgarr[i]
             // fix https://github.com/alexeyten/qr-image/issues/19
         doc.save()
-        doc.path(svgQr.path).scale(opt.scale).fill('black', 'non-zero')
+        doc.path(svgQr.path).scale(opt.scale).fill(color, 'non-zero')
         doc.restore()
             // keep translate ratio
         doc.translate(tx, ty)
@@ -127,11 +141,14 @@ function textArray(textarr, opt) {
     // doc.font('fonts/SigmarOne.ttf').fontSize(30).text('Font: SigmarOne', 20, 200)
     // Oswald-Regular
     doc.save()
-    doc.translate(marginx, marginy)
+    doc.translate(opt.pgmx, opt.pgmy)
     doc.font(opt.ttf).fontSize(opt.size)
+
     for (var i = 0; i < patterNum; i++) {
         rx = opt.ran ? opt.rx + math.randomInt(0, opt.ranx) : opt.rx
         ry = opt.ran ? opt.ry + math.randomInt(0, opt.rany) : opt.ry
+        color = opt.rancolor ? math.pickRandom(opt.colorarr) : opt.color
+        doc.fillColor(color)
         row = Math.floor(i / 2)
         tx = rx + ((i % 2 == 0) ? 0 : itemWidth)
         ty = ry + itemHeight * row
@@ -140,9 +157,9 @@ function textArray(textarr, opt) {
     doc.restore()
 }
 
-function patternArray(ptsvg) {
+function patternArray(ptsvg, opt) {
     doc.save()
-    doc.translate(marginx, marginy)
+    doc.translate(opt.pgmx, opt.pgmy)
     for (var i = 0; i < patterNum; i++) {
         tx = ((i % 2 == 0) ? itemWidth : itemWidth * -1)
         ty = ((i % 2 == 0) ? 0 : itemHeight)
@@ -156,22 +173,36 @@ function patternArray(ptsvg) {
 }
 
 function pageFront() {
-    patternArray(svgFront)
+    pgx = pgmarginx
+    pgy = pgmarginy
+    patternArray(svgFront, {
+            pgmx: pgx,
+            pgmy: pgy
+        })
         // address qr
     qrSvgArray(svgaddrarr, {
+        pgmx: pgx,
+        pgmy: pgy,
+        rancolor: true,
+        colorarr: qrcolorarr,
         rx: 60,
         ry: 40,
-        scale: 2.0
+        scale: 1.5
     })
 
     textArray(addrarr, {
+        pgmx: pgx,
+        pgmy: pgy,
         ttf: 'fonts/Cousine-Bold.ttf',
-        size: 12,
+        color: '#DF013A',
+        size: 10,
         rx: 60,
         ry: 20
     })
 
     textArray(y12seqarr, {
+        pgmx: pgx,
+        pgmy: pgy,
         ttf: 'fonts/Oswald-Regular.ttf',
         size: 8,
         rx: 280,
@@ -193,18 +224,42 @@ function lsArrMv(arr) {
     return rarr
 }
 
+// 20151023 print double-sided test (mjprintone), pageBack need to fix the marginy issue
+// test1 marginy -2 / result :
+// DoubleSidedFix
+var DSF = {
+    NORMAL: 0,
+    MJPRINT: -2
+}
+
 function pageBack() {
     // landscape print 0/2/4 move to 1/3/5
     // pattern not to lsArrMv()
-    patternArray(svgBack)
+    //
+    pgmyfix = DSF.MJPRINT
+
+    pgx = pgmarginx
+    pgy = pgmarginy + pgmyfix
+    patternArray(svgBack, {
+        pgmx: pgx,
+        pgmy: pgy
+    })
+
     qrSvgArray(lsArrMv(svgbip38arr), {
+        pgmx: pgx,
+        pgmy: pgy,
+        rancolor: true,
+        colorarr: qrcolorarr,
         rx: 50,
         ry: 40,
         scale: 1.5
     })
 
     textArray(lsArrMv(bip38arr), {
+        pgmx: pgx,
+        pgmy: pgy,
         ttf: 'fonts/Cousine-Bold.ttf',
+        color: '#DF013A',
         size: 8,
         rx: 50,
         ry: 20
@@ -212,9 +267,14 @@ function pageBack() {
 
     // bip38 passphrase
     textArray(lsArrMv(passarr), {
+        pgmx: pgx,
+        pgmy: pgy,
         ttf: 'fonts/Cousine-Bold.ttf',
+        color: '#D358F7',
         size: 12,
         ran: true,
+        rancolor: true,
+        colorarr: passcolorarr,
         rx: 130,
         ry: 40,
         ranx: 80,
@@ -222,10 +282,13 @@ function pageBack() {
     })
 
     textArray(lsArrMv(priceseqarr), {
+        pgmx: pgx,
+        pgmy: pgy,
         ttf: 'fonts/Oswald-Regular.ttf',
+        color: 'green',
         size: 8,
-        rx: 250,
-        ry: 170
+        rx: 230,
+        ry: 160
     })
 
 }
