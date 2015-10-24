@@ -4,6 +4,8 @@ var bip38 = new Bip38()
 var math = require('mathjs');
 var request = require('request');
 var format = require('string-format');
+// bermi/password-generator  https://github.com/bermi/password-generator
+var generatePassword = require('password-generator');
 // Moment.js http://momentjs.com/docs/#/displaying/
 var moment = require('moment');
 // devongovett/pdfkit https://github.com/devongovett/pdfkit
@@ -19,12 +21,14 @@ var qr = require('qr-image');
 // pixl-xml  https://www.npmjs.com/package/pixl-xml
 var XML = require('pixl-xml');
 
+// TaichungBanana TB
 var conf = {
-    svgfront: 'qr32f5.min.svg',
-    svgback: 'qr32b5.min.svg',
-    pdf: 'qr32-5.pdf',
+    svgfront: 'qr32f6.min.svg',
+    svgback: 'qr32b6.min.svg',
+    pdf: 'qr32-6a.pdf',
     pricebtcusd: 279,
-    priceusdtwd: 32.34
+    priceusdtwd: 32.5,
+    codename: 'TB'
 }
 
 var svgFront = XML.parse(conf.svgfront);
@@ -64,11 +68,14 @@ doc.pipe(fs.createWriteStream(conf.pdf))
 // 3x2 A4
 // 594/3 = 198 - 4 = 194
 // 840/2 = 420 - 4 = 416
-var itemWidth = 416
-var itemHeight = 194
-var patterNum = 6
-var pgmarginx = 5
-var pgmarginy = 6
+// v6 400x180
+var itemWidth = 400
+var itemHeight = 180
+var patterncol = 2
+var patternrow = 3
+var patterNum = patternrow * patterncol
+var pgmarginx = 21
+var pgmarginy = 28
     // svg 200x80 px
 var pkarr = []
 var addrarr = []
@@ -79,6 +86,8 @@ var passarr = []
 var bip38arr = []
 var svgbip38arr = []
 var imgptarr = []
+var datearr = []
+datetag = moment().format()
     // generate bitcoin privatekey and address
 for (var i = 0; i < patterNum; i++) {
     var pk = new bitcore.PrivateKey()
@@ -96,11 +105,14 @@ for (var i = 0; i < patterNum; i++) {
         //console.log(svg)
         // BTCUSD/BTCTWD/USDTWD
     seqnum = 10001 + i
-    seq = format('{0}-Y12TW {1}', moment().format('YYYYMMDDHH'), seqnum)
-    priceseq = format('BTCUSD{0}  USDTWD{1}  {2}', conf.pricebtcusd, conf.priceusdtwd, seqnum)
+    seq = format('{0}{1}', conf.codename, seqnum)
+
+    datearr.push(datetag)
+
+    priceseq = format('BTCUSD{0}  USDTWD{1}  {2}{3}', conf.pricebtcusd, conf.priceusdtwd, conf.codename, seqnum)
     y12seqarr.push(seq)
     priceseqarr.push(priceseq)
-    bip38pass = 'Y12 ' + math.randomInt(1000, 9999) + ' ' + math.randomInt(1000, 9999) + ' ' + math.randomInt(1000, 9999)
+    bip38pass = generatePassword(16, false)
     passarr.push(bip38pass)
         // test-fast
     bip38str = bip38RealMode ? bip38encode(pk, addr, bip38pass) : '6PYNKZ1EAgYgmQfmNVamxyXVWHzK5s6DGhwP4J5o44cvXdoY7sRzhtpUeo'
@@ -109,8 +121,8 @@ for (var i = 0; i < patterNum; i++) {
         type: 'svg'
     })
     svgbip38arr.push(svgBip38)
-    // Pattern1-300px.png to 6
-    imgptarr.push(format('Pattern{0}-300px.png',math.randomInt(1,6)))
+        // Pattern1-300px.png to 6
+    imgptarr.push(format('Pattern{0}-300px.png', math.randomInt(1, 6)))
 }
 
 function bip38encode(key, addr, pass) {
@@ -169,7 +181,9 @@ function imgArray(imgarr, opt) {
         row = Math.floor(i / 2)
         tx = rx + ((i % 2 == 0) ? 0 : itemWidth)
         ty = ry + itemHeight * row
-        doc.image(imgarr[i], tx, ty, {width: opt.imgwidth})
+        doc.image(imgarr[i], tx, ty, {
+            width: opt.imgwidth
+        })
     }
     doc.restore()
 }
@@ -189,16 +203,45 @@ function patternArray(ptsvg, opt) {
     doc.restore()
 }
 
+function outline(opt) {
+    doc.save()
+    doc.translate(opt.pgmx, opt.pgmy)
+    len = 12
+    gap = 2
+        // 2x3 to 3x4
+    var loopnum = (patterncol + 1) * (patternrow + 1)
+    for (var i = 0; i < loopnum; i++) {
+        if (i % 3 == 0) {
+            tx = i == 0 ? 0 : -2 * itemWidth
+            ty = i == 0 ? 0 : itemHeight
+        } else {
+            tx = itemWidth
+            ty = 0
+        }
+        doc.translate(tx, ty)
+        doc
+            .moveTo(0, gap).lineTo(0, len).moveTo(gap, 0).lineTo(len, 0)
+            .moveTo(0, -gap).lineTo(0, -len).moveTo(-gap, 0).lineTo(-len, 0)
+            .stroke()
+    }
+    doc.restore()
+}
+
 function pageFront() {
     pgx = pgmarginx
     pgy = pgmarginy
 
+    outline({
+        pgmx: pgx,
+        pgmy: pgy
+    })
+
     imgArray(imgptarr, {
         pgmx: pgx,
         pgmy: pgy,
-        rx: 140,
-        ry: 45,
-        imgwidth:100
+        rx: 145,
+        ry: 40,
+        imgwidth: 90
     })
 
     patternArray(svgFront, {
@@ -221,17 +264,28 @@ function pageFront() {
         pgmy: pgy,
         ttf: 'fonts/Cousine-Bold.ttf',
         color: '#DF013A',
-        size: 10,
+        size: 8,
         rx: 60,
-        ry: 20
+        ry: 15
     })
 
     textArray(y12seqarr, {
         pgmx: pgx,
         pgmy: pgy,
         ttf: 'fonts/Oswald-Regular.ttf',
-        size: 8,
-        rx: 280,
+        size: 12,
+        color: '#DF013A',
+        rx: 320,
+        ry: 80
+    })
+
+    textArray(datearr, {
+        pgmx: pgx,
+        pgmy: pgy,
+        ttf: 'fonts/Oswald-Regular.ttf',
+        size: 5,
+        color: '#7F312A',
+        rx: 320,
         ry: 160
     })
 
@@ -254,11 +308,12 @@ function lsArrMv(arr) {
 }
 
 // 20151023 print double-sided test (mjprintone), pageBack need to fix the marginy issue
-// test1 marginy -2 / result :
-// DoubleSidedFix
+// test1 marginy -2 / result : pageBack with blank area.
+// DoubleSidedFix ? pageFront move lower?
+// test2 800% 95mm to 75mm/-6 79mm/-5(screen)
 var DSF = {
     NORMAL: 0,
-    MJPRINT: -2
+    MJPRINT: -5
 }
 
 function pageBack() {
@@ -269,6 +324,12 @@ function pageBack() {
 
     pgx = pgmarginx
     pgy = pgmarginy + pgmyfix
+
+    outline({
+        pgmx: pgx,
+        pgmy: pgy
+    })
+
     patternArray(svgBack, {
         pgmx: pgx,
         pgmy: pgy
@@ -277,11 +338,9 @@ function pageBack() {
     qrSvgArray(lsArrMv(svgbip38arr), {
         pgmx: pgx,
         pgmy: pgy,
-        rancolor: true,
-        colorarr: qrcolorarr,
-        rx: 50,
-        ry: 40,
-        scale: 1.5
+        rx: 45,
+        ry: 30,
+        scale: 1.2
     })
 
     textArray(lsArrMv(bip38arr), {
@@ -290,7 +349,7 @@ function pageBack() {
         ttf: 'fonts/Cousine-Bold.ttf',
         color: '#DF013A',
         size: 8,
-        rx: 50,
+        rx: 45,
         ry: 20
     })
 
@@ -300,14 +359,14 @@ function pageBack() {
         pgmy: pgy,
         ttf: 'fonts/Cousine-Bold.ttf',
         color: '#D358F7',
-        size: 12,
+        size: 10,
         ran: true,
         rancolor: true,
         colorarr: passcolorarr,
-        rx: 130,
+        rx: 110,
         ry: 40,
-        ranx: 80,
-        rany: 70
+        ranx: 70,
+        rany: 60
     })
 
     textArray(lsArrMv(priceseqarr), {
@@ -316,9 +375,19 @@ function pageBack() {
         ttf: 'fonts/Oswald-Regular.ttf',
         color: 'green',
         size: 8,
-        rx: 230,
-        ry: 160
+        rx: 200,
+        ry: 140
     })
+
+    imgArray(lsArrMv(imgptarr), {
+        pgmx: pgx,
+        pgmy: pgy,
+        rx: 45,
+        ry: 80,
+        imgwidth: 40
+    })
+
+
 
 }
 
